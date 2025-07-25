@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Toaster } from './components/ui/sonner.tsx';
 import { Feed } from './components/Feed.tsx';
 import { Discover } from './components/Discover.tsx';
@@ -6,11 +6,13 @@ import { Messages } from './components/Messages.tsx';
 import { Profile } from './components/Profile.tsx';
 import { Create } from './components/Create.tsx';
 import { MusicianOnboarding } from './components/MusicianOnboarding.tsx';
+import { SignIn } from './components/SignIn.tsx';
 import { BottomNavigation } from './components/BottomNavigation.tsx';
+import { supabase, getCurrentUser, signOut } from './utils/supabase.ts';
 import { toast } from 'sonner';
-import { supabase } from './utils/supabase.ts';
 
 type Tab = 'feed' | 'discover' | 'create' | 'messages' | 'profile';
+type AuthView = 'signin' | 'signup';
 
 interface Musician {
   id: string;
@@ -60,8 +62,10 @@ interface Collaboration {
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState<Tab>('feed');
-  const [hasOnboarded, setHasOnboarded] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState<Musician | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [authView, setAuthView] = useState<AuthView>('signin');
 
   // Mock data
   const [posts] = useState<Post[]>([
@@ -156,67 +160,167 @@ export default function App() {
     }
   ]);
 
-  const handleOnboardingComplete = (userData: Partial<Musician>) => {
-    const newUser: Musician = {
-      id: Date.now().toString(),
-      name: userData.name || '',
-      username: userData.username || '',
-      bio: userData.bio || '',
-      avatar: userData.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face',
-      instruments: userData.instruments || [],
-      genres: userData.genres || [],
-      experience: userData.experience || 'Beginner',
-      location: userData.location || '',
+  useEffect(() => {
+    // Check if user is already authenticated
+    checkAuthState();
+    
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+          await loadUserProfile(session.user);
+        } else if (event === 'SIGNED_OUT') {
+          setIsAuthenticated(false);
+          setCurrentUser(null);
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const checkAuthState = async () => {
+    try {
+      const { user } = await getCurrentUser();
+      if (user) {
+        await loadUserProfile(user);
+      }
+    } catch (error) {
+      console.error('Error checking auth state:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loadUserProfile = async (user: any) => {
+    // Create user profile from auth metadata
+    const userProfile: Musician = {
+      id: user.id,
+      name: user.user_metadata?.name || '',
+      username: user.user_metadata?.username || '',
+      bio: user.user_metadata?.bio || '',
+      avatar: user.user_metadata?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face',
+      instruments: user.user_metadata?.instruments || [],
+      genres: user.user_metadata?.genres || [],
+      experience: user.user_metadata?.experience || 'Beginner',
+      location: user.user_metadata?.location || '',
       isAvailable: true,
       followers: 0,
       following: 0,
       projects: 0
     };
     
-    setCurrentUser(newUser);
-    setHasOnboarded(true);
-    toast.success(`Welcome to MusicConnect, ${newUser.name}!`, {
+    setCurrentUser(userProfile);
+    setIsAuthenticated(true);
+  };
+
+  const handleSignIn = (user: any) => {
+    // This will be called after successful sign-in
+    // The user profile will be loaded by the auth state listener
+    // but we can set authenticated to true now for better UX
+    setIsAuthenticated(true);
+    setCurrentTab('feed');
+  };
+
+  const handleOnboardingComplete = (userData: any) => {
+    // Create a temporary user profile while waiting for auth state to update
+    const userProfile: Musician = {
+      id: 'temp-id', // Will be replaced when auth state updates
+      name: userData.name,
+      username: userData.username,
+      bio: userData.bio,
+      avatar: userData.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face',
+      instruments: userData.instruments,
+      genres: userData.genres,
+      experience: userData.experience,
+      location: userData.location,
+      isAvailable: true,
+      followers: 0,
+      following: 0,
+      projects: 0
+    };
+    
+    // Update state immediately to redirect to Feed
+    setCurrentUser(userProfile);
+    setIsAuthenticated(true);
+    setCurrentTab('feed');
+    
+    // Show welcome toast
+    toast.success(`Welcome to MusicConnect, ${userData.name}!`, {
       description: "Start discovering and collaborating with musicians",
       duration: 3000,
     });
   };
 
-  // Show onboarding if not completed
-  if (!hasOnboarded || !currentUser) {
-    return <MusicianOnboarding onComplete={handleOnboardingComplete} />;
-  }
-
-  const renderCurrentTab = () => {
-    switch (currentTab) {
-      case 'feed':
-        return <Feed posts={posts} currentUser={currentUser} />;
-      case 'discover':
-        return <Discover collaborations={collaborations} currentUser={currentUser} />;
-      case 'create':
-        return <Create currentUser={currentUser} onBack={() => setCurrentTab('feed')} />;
-      case 'messages':
-        return <Messages currentUser={currentUser} />;
-      case 'profile':
-        return <Profile musician={currentUser} isOwnProfile={true} />;
-      default:
-        return null;
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      setCurrentUser(null);
+      setIsAuthenticated(false);
+      setAuthView('signin');
+      toast.success('Signed out successfully');
+    } catch (error) {
+      toast.error('Failed to sign out');
+      console.error(error);
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show authentication views if not authenticated
+  if (!isAuthenticated || !currentUser) {
+    if (authView === 'signin') {
+      return (
+        <SignIn 
+          onSignIn={handleSignIn} 
+          onSwitchToSignUp={() => setAuthView('signup')} 
+        />
+      );
+    } else {
+      return (
+        <MusicianOnboarding 
+          onComplete={handleOnboardingComplete} 
+          onSwitchToSignIn={() => setAuthView('signin')}
+        />
+      );
+    }
+  }
+
+  // Main app content when authenticated
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-gray-50 pb-16">
       <Toaster position="top-center" richColors />
       
-      {/* Main Content */}
-      <div className="pb-20">
-        {renderCurrentTab()}
-      </div>
+      {renderCurrentTab()}
       
-      {/* Bottom Navigation */}
-      <BottomNavigation 
+      <BottomNavigation
         currentTab={currentTab}
         onTabChange={setCurrentTab}
       />
     </div>
   );
+  
+  function renderCurrentTab() {
+    switch (currentTab) {
+      case 'feed':
+        return <Feed currentUser={currentUser!} onSignOut={handleSignOut} />;
+      case 'discover':
+        return <Discover currentUser={currentUser!} collaborations={collaborations} />;
+      case 'create':
+        return <Create currentUser={currentUser!} onPostCreated={() => setCurrentTab('feed')} />;
+      case 'messages':
+        return <Messages currentUser={currentUser!} />;
+      case 'profile':
+        return <Profile musician={currentUser!} isOwnProfile={true} />;
+    }
+  }
 }

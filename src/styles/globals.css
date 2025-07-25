@@ -196,8 +196,7 @@ html {
 /* Bottom navigation styling */
 .bottom-nav {
   backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.8);
-  border-top: 1px solid rgba(229, 231, 235, 0.8);
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
 }
 
 /* Tab indicator animation */
@@ -325,191 +324,208 @@ html {
 
 /* Add these classes to your globals.css */
 .gradient-background {
-  background: linear-gradient(135deg, #a78bfa 0%, #3b82f6 100%);
   min-height: 100vh;
+  background: linear-gradient(135deg, #f0f4ff 0%, #f9f4ff 100%);
+  padding: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
 }
 
 .icon-container {
-  width: 5rem;
-  height: 5rem;
-  background-color: white;
-  border-radius: 50%;
+  background: white;
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
   margin-bottom: 1.5rem;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 .page-title {
-  font-size: 1.875rem;
+  font-size: 2rem;
   font-weight: 700;
-  color: white;
-  margin-bottom: 0.5rem;
   text-align: center;
+  margin-bottom: 0.5rem;
+  color: #1e293b;
 }
 
 .page-subtitle {
-  font-size: 1.125rem;
-  color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 2rem;
+  font-size: 1rem;
   text-align: center;
-}
-
-.stepper {
-  display: flex;
-  align-items: center;
+  color: #64748b;
   margin-bottom: 2rem;
-}
-
-.step {
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 0.875rem;
-}
-
-.step-active {
-  background-color: white;
-  color: #8b5cf6;
-}
-
-.step-completed {
-  background-color: rgba(255, 255, 255, 0.9);
-  color: #8b5cf6;
-}
-
-.step-inactive {
-  background-color: rgba(139, 92, 246, 0.5);
-  color: white;
-}
-
-.step-line {
-  height: 2px;
-  width: 2rem;
-  background-color: rgba(255, 255, 255, 0.3);
 }
 
 .card {
-  background-color: white;
-  border-radius: 0.75rem;
+  background: white;
   padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
   width: 100%;
-  max-width: 28rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-  animation: fade-in 0.3s ease-out;
+  max-width: 450px;
 }
 
 .form-title {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 600;
-  text-align: center;
   margin-bottom: 1.5rem;
+  color: #1e293b;
 }
 
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .form-label {
   display: block;
-  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
   font-weight: 500;
-  margin-bottom: 0.25rem;
+  color: #475569;
 }
 
 .form-input {
   width: 100%;
   padding: 0.75rem 1rem;
+  font-size: 1rem;
   border: 1px solid #e2e8f0;
-  border-radius: 0.5rem;
-  background-color: #f8fafc;
+  border-radius: 6px;
+  transition: border-color 0.15s ease-in-out;
 }
 
-.form-textarea {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.5rem;
-  background-color: #f8fafc;
-  min-height: 6rem;
-  resize: vertical;
-}
-
-.button-container {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 2rem;
+.form-input:focus {
+  outline: none;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.1);
 }
 
 .button {
   padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease-out;
-}
-
-.button-back {
-  background-color: #f1f5f9;
-  color: #64748b;
-}
-
-.button-next {
-  background: linear-gradient(to right, #8b5cf6, #3b82f6);
-  color: white;
-}
-
-.button:hover {
-  transform: translateY(-1px);
-}
-
-.button:active {
-  transform: translateY(0);
-}
-
-.instrument-grid, .genre-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-
-.instrument-item, .genre-item {
-  padding: 0.75rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.5rem;
-  text-align: center;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.15s ease;
   cursor: pointer;
+}
+
+.button-primary {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  border: none;
+}
+
+.button-primary:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+}
+
+.button-primary:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.flex {
+  display: flex;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.mt-6 {
+  margin-top: 1.5rem;
+}
+
+/* Add this to the end of your globals.css file */
+
+.bottom-nav {
+  backdrop-filter: blur(10px);
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+}
+
+.tab-button {
+  transition: all 0.2s ease;
+}
+
+.tab-button:active {
+  transform: scale(0.95);
+}
+
+.create-button {
+  position: relative;
+}
+
+.create-button-bg {
+  position: absolute;
+  inset: -4px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.create-button.active .create-button-bg {
+  opacity: 1;
+}
+
+.create-button-icon {
+  z-index: 2;
+  position: relative;
+}
+
+/* Add to the end of your globals.css file */
+
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari, Opera */
+}
+
+/* Add these styles for the post cards */
+.post-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.post-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Improve button interactions */
+.action-button {
   transition: all 0.2s;
 }
 
-.instrument-item.selected, .genre-item.selected {
-  background-color: #8b5cf6;
-  color: white;
-  border-color: #7c3aed;
+.action-button:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+  border-radius: 9999px;
 }
 
-.form-select {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.5rem;
-  background-color: #f8fafc;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-  background-position: right 0.5rem center;
-  background-repeat: no-repeat;
-  background-size: 1.5em 1.5em;
+.action-button:active {
+  transform: scale(0.95);
+}
+
+/* Badge styles that match the image */
+.tag-badge {
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  font-weight: 400;
 }

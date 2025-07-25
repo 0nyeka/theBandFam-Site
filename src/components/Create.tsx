@@ -35,9 +35,9 @@ interface Musician {
   projects: number;
 }
 
-interface CreateProps {
+export interface CreateProps {
   currentUser: Musician;
-  onBack: () => void;
+  onPostCreated?: () => void;
 }
 
 const POST_TYPES = [
@@ -81,7 +81,7 @@ const GENRES = [
   'Indie', 'Electronic', 'Hip Hop', 'R&B', 'Soul', 'Funk', 'Reggae', 'Punk'
 ];
 
-export function Create({ currentUser, onBack }: CreateProps) {
+export function Create({ currentUser, onPostCreated }: CreateProps) {
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     title: '',
@@ -126,7 +126,7 @@ export function Create({ currentUser, onBack }: CreateProps) {
   const handleSubmit = () => {
     // Here you would normally submit the post
     console.log('Submitting post:', { type: selectedType, ...formData });
-    onBack();
+    onPostCreated?.();
   };
 
   const isFormValid = () => {
@@ -152,7 +152,7 @@ export function Create({ currentUser, onBack }: CreateProps) {
         <div className="max-w-2xl mx-auto p-4">
           {/* Header */}
           <div className="flex items-center mb-6">
-            <Button variant="ghost" onClick={onBack} className="p-2 mr-2">
+            <Button variant="ghost" onClick={onPostCreated} className="p-2 mr-2">
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <div>

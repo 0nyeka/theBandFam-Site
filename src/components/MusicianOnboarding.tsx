@@ -5,9 +5,14 @@ import { Textarea } from './ui/textarea.tsx';
 import { Badge } from './ui/badge.tsx';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card.tsx';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select.tsx';
-import { Music, Guitar, Mic, Piano, Drum, MapPin, Star, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Music, Guitar, Mic, Piano, Drum, MapPin, Star, ArrowRight, ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { signUp } from '../utils/supabase.ts';
+import { toast } from 'sonner';
 
 interface OnboardingData {
+  email: string;
+  password: string;
+  confirmPassword: string;
   name: string;
   username: string;
   bio: string;
@@ -20,6 +25,7 @@ interface OnboardingData {
 
 interface MusicianOnboardingProps {
   onComplete: (data: OnboardingData) => void;
+  onSwitchToSignIn?: () => void; // Add this prop
 }
 
 const INSTRUMENTS = [
@@ -34,9 +40,15 @@ const GENRES = [
   'Metal', 'Progressive', 'Fusion', 'World', 'Experimental', 'Ambient'
 ];
 
-export function MusicianOnboarding({ onComplete }: MusicianOnboardingProps) {
+export function MusicianOnboarding({ onComplete, onSwitchToSignIn }: MusicianOnboardingProps) {
   const [step, setStep] = useState(1);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<OnboardingData>({
+    email: '',
+    password: '',
+    confirmPassword: '',
     name: '',
     username: '',
     bio: '',
@@ -65,11 +77,50 @@ export function MusicianOnboarding({ onComplete }: MusicianOnboardingProps) {
     }));
   };
 
-  const handleNext = () => {
-    if (step < 4) {
+  const handleNext = async () => {
+    if (step < 5) {
       setStep(step + 1);
     } else {
-      onComplete(data);
+      // Final step - create account
+      await handleCreateAccount();
+    }
+  };
+
+  const handleCreateAccount = async () => {
+    setIsLoading(true);
+    
+    try {
+      const userData = {
+        name: data.name,
+        username: data.username,
+        bio: data.bio,
+        instruments: data.instruments,
+        genres: data.genres,
+        experience: data.experience,
+        location: data.location
+      };
+
+      const { data: authData, error } = await signUp(data.email, data.password, userData);
+      
+      if (error) {
+        toast.error('Account creation failed', {
+          description: error.message
+        });
+        return;
+      }
+
+      if (authData.user) {
+        toast.success('Account created successfully!', {
+          description: 'Please check your email to verify your account.'
+        });
+        onComplete(data);
+      }
+    } catch (error) {
+      toast.error('Something went wrong', {
+        description: 'Please try again later.'
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -82,19 +133,23 @@ export function MusicianOnboarding({ onComplete }: MusicianOnboardingProps) {
   const isStepValid = () => {
     switch (step) {
       case 1:
-        return data.name.trim() && data.username.trim();
+        return data.email.trim() && 
+               data.password.length >= 6 && 
+               data.password === data.confirmPassword;
       case 2:
-        return data.instruments.length > 0;
+        return data.name.trim() && data.username.trim();
       case 3:
-        return data.genres.length > 0;
+        return data.instruments.length > 0;
       case 4:
+        return data.genres.length > 0;
+      case 5:
         return data.location.trim();
       default:
         return false;
     }
   };
 
-  const totalSteps = 4;
+  const totalSteps = 5;
   
   return (
     <div className="gradient-background">
@@ -109,12 +164,12 @@ export function MusicianOnboarding({ onComplete }: MusicianOnboardingProps) {
       
       {/* Stepper */}
       <div className="stepper">
-        {[1, 2, 3, 4].map((s, i) => (
+        {[1, 2, 3, 4, 5].map((s, i) => (
           <div key={s} style={{display: 'flex', alignItems: 'center'}}>
             <div className={`step ${s === step ? 'step-active' : s < step ? 'step-completed' : 'step-inactive'}`}>
               {s}
             </div>
-            {i < 3 && <div className="step-line"></div>}
+            {i < 4 && <div className="step-line"></div>}
           </div>
         ))}
       </div>
@@ -122,6 +177,86 @@ export function MusicianOnboarding({ onComplete }: MusicianOnboardingProps) {
       {/* Card */}
       <div className="card">
         {step === 1 && (
+          <>
+            <h2 className="form-title">Create your account</h2>
+            <form>
+              <div className="form-group">
+                <label className="form-label">Email Address</label>
+                <input 
+                  type="email"
+                  className="form-input" 
+                  placeholder="Enter your email" 
+                  value={data.email} 
+                  onChange={(e) => setData({...data, email: e.target.value})} 
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Password</label>
+                <div style={{ position: 'relative' }}>
+                  <input 
+                    type={showPassword ? "text" : "password"}
+                    className="form-input" 
+                    placeholder="Create a secure password" 
+                    value={data.password} 
+                    onChange={(e) => setData({...data, password: e.target.value})} 
+                  />
+                  <button
+                    type="button"
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer'
+                    }}
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+                <small style={{ color: '#666', fontSize: '12px' }}>
+                  Password must be at least 6 characters long
+                </small>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Confirm Password</label>
+                <div style={{ position: 'relative' }}>
+                  <input 
+                    type={showConfirmPassword ? "text" : "password"}
+                    className="form-input" 
+                    placeholder="Confirm your password" 
+                    value={data.confirmPassword} 
+                    onChange={(e) => setData({...data, confirmPassword: e.target.value})} 
+                  />
+                  <button
+                    type="button"
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer'
+                    }}
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+                {data.password && data.confirmPassword && data.password !== data.confirmPassword && (
+                  <small style={{ color: '#ef4444', fontSize: '12px' }}>
+                    Passwords do not match
+                  </small>
+                )}
+              </div>
+            </form>
+          </>
+        )}
+
+        {step === 2 && (
           <>
             <h2 className="form-title">Tell us about yourself</h2>
             <form>
@@ -156,7 +291,7 @@ export function MusicianOnboarding({ onComplete }: MusicianOnboardingProps) {
           </>
         )}
 
-        {step === 2 && (
+        {step === 3 && (
           <>
             <h2 className="form-title">What instruments do you play?</h2>
             <div className="instrument-grid">
@@ -173,7 +308,7 @@ export function MusicianOnboarding({ onComplete }: MusicianOnboardingProps) {
           </>
         )}
 
-        {step === 3 && (
+        {step === 4 && (
           <>
             <h2 className="form-title">What genres do you prefer?</h2>
             <div className="genre-grid">
@@ -190,7 +325,7 @@ export function MusicianOnboarding({ onComplete }: MusicianOnboardingProps) {
           </>
         )}
 
-        {step === 4 && (
+        {step === 5 && (
           <>
             <h2 className="form-title">Almost done!</h2>
             <div className="form-group">
@@ -231,10 +366,22 @@ export function MusicianOnboarding({ onComplete }: MusicianOnboardingProps) {
             type="button" 
             className="button button-next"
             onClick={handleNext}
-            disabled={!isStepValid()}
+            disabled={!isStepValid() || isLoading}
           >
-            {step === 4 ? 'Complete' : 'Next →'}
+            {isLoading ? 'Creating Account...' : step === 5 ? 'Create Account' : 'Next →'}
           </button>
+        </div>
+
+        <div className="mt-6 text-center text-sm">
+          <p className="text-gray-600">
+            Already have an account?{' '}
+            <button 
+              onClick={onSwitchToSignIn} 
+              className="text-purple-600 hover:text-purple-800 font-medium"
+            >
+              Sign In
+            </button>
+          </p>
         </div>
       </div>
     </div>

@@ -1,24 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { LogOut, Search, Users, Video, Search as SearchIcon, Calendar, Clock, MapPin, Heart, MessageSquare, Share2 } from 'lucide-react';
+import { supabase } from '../utils/supabase.ts';
 import { Button } from './ui/button.tsx';
-import { Card, CardContent, CardHeader } from './ui/card.tsx';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar.tsx';
 import { Badge } from './ui/badge.tsx';
-import { Input } from './ui/input.tsx';
-import { 
-  Heart, 
-  MessageCircle, 
-  Share, 
-  Play, 
-  Search, 
-  Filter,
-  Music,
-  Users,
-  Calendar,
-  MapPin,
-  Clock,
-  Headphones,
-  Video
-} from 'lucide-react';
+import { Skeleton } from './ui/skeleton.tsx';
+import { Avatar } from './ui/avatar.tsx';
+import { EmptyState } from './EmptyState.tsx';
 
 interface Musician {
   id: string;
@@ -54,308 +41,250 @@ interface Post {
 }
 
 interface FeedProps {
-  posts: Post[];
   currentUser: Musician;
+  onSignOut?: () => void;
 }
 
-const getPostTypeIcon = (type: string) => {
-  switch (type) {
-    case 'collaboration':
-      return <Users className="w-4 h-4" />;
-    case 'showcase':
-      return <Play className="w-4 h-4" />;
-    case 'looking-for':
-      return <Search className="w-4 h-4" />;
-    case 'jam-session':
-      return <Calendar className="w-4 h-4" />;
-    default:
-      return <Music className="w-4 h-4" />;
-  }
-};
+export function Feed({ currentUser, onSignOut }: FeedProps) {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedFilter, setSelectedFilter] = useState('all');
+  
+  // Fetch posts from Supabase when component mounts
+  useEffect(() => {
+    // Simulate loading
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      // We're keeping posts empty for now, as requested
+    }, 1000);
+    
+    return () => clearTimeout(timer);
+    
+    // Commented out real fetch logic for now
+    // fetchPosts();
+    // ...existing Supabase subscription logic
+  }, []);
+  
+  // Keep existing functions but don't call them for now
+  // ...existing fetchPosts, fetchPostDetails, checkUserLikes, handleLike functions
 
-const getPostTypeColor = (type: string) => {
-  switch (type) {
-    case 'collaboration':
-      return 'bg-blue-100 text-blue-700';
-    case 'showcase':
-      return 'bg-purple-100 text-purple-700';
-    case 'looking-for':
-      return 'bg-green-100 text-green-700';
-    case 'jam-session':
-      return 'bg-orange-100 text-orange-700';
-    default:
-      return 'bg-gray-100 text-gray-700';
-  }
-};
-
-const formatPostType = (type: string) => {
-  switch (type) {
-    case 'collaboration':
-      return 'Collaboration';
-    case 'showcase':
-      return 'Showcase';
-    case 'looking-for':
-      return 'Looking for Musicians';
-    case 'jam-session':
-      return 'Jam Session';
-    default:
-      return 'Post';
-  }
-};
-
-export function Feed({ posts, currentUser }: FeedProps) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState<string>('all');
-  const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
-
-  const handleLike = (postId: string) => {
-    setLikedPosts(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(postId)) {
-        newSet.delete(postId);
-      } else {
-        newSet.add(postId);
-      }
-      return newSet;
-    });
-  };
-
+  // Filter posts by type (will be empty for now)
   const filteredPosts = posts.filter(post => {
-    const matchesSearch = post.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         post.musician.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         post.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-    
-    const matchesFilter = selectedFilter === 'all' || post.type === selectedFilter;
-    
-    return matchesSearch && matchesFilter;
+    return selectedFilter === 'all' || post.type === selectedFilter;
   });
-
+  
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50">
-      <div className="max-w-2xl mx-auto p-4">
-        {/* Header */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Feed</h1>
-              <p className="text-gray-600">Discover what's happening in the music community</p>
-            </div>
-            <Avatar>
-              <AvatarImage src={currentUser.avatar} />
-              <AvatarFallback>{currentUser.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-            </Avatar>
+    <div className="bg-[#f8fafc] min-h-screen pb-16">
+      {/* Header */}
+      <header className="bg-white flex justify-between items-center p-4 border-b border-gray-200 sticky top-0 z-10">
+        <h1 className="text-xl font-bold text-purple-600">MusicConnect</h1>
+        <button 
+          onClick={onSignOut}
+          className="flex items-center gap-1 py-1 px-3 border border-gray-300 rounded-md text-gray-700 text-sm hover:bg-gray-50"
+        >
+          <LogOut size={15} /> Sign Out
+        </button>
+      </header>
+      
+      <div className="max-w-[600px] mx-auto px-4 mt-6">
+        {/* Feed Title and User Avatar */}
+        <div className="flex items-start justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800">Feed</h2>
+            <p className="text-gray-600 text-sm">Discover what's happening in the music community</p>
           </div>
-
-          {/* Search and Filter */}
-          <div className="space-y-3">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search posts, musicians, or tags..."
-                className="pl-10"
-              />
-            </div>
-            
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              <Badge
-                variant={selectedFilter === 'all' ? 'default' : 'outline'}
-                className="cursor-pointer whitespace-nowrap"
-                onClick={() => setSelectedFilter('all')}
-              >
-                All Posts
-              </Badge>
-              <Badge
-                variant={selectedFilter === 'collaboration' ? 'default' : 'outline'}
-                className="cursor-pointer whitespace-nowrap"
-                onClick={() => setSelectedFilter('collaboration')}
-              >
-                <Users className="w-3 h-3 mr-1" />
-                Collaborations
-              </Badge>
-              <Badge
-                variant={selectedFilter === 'showcase' ? 'default' : 'outline'}
-                className="cursor-pointer whitespace-nowrap"
-                onClick={() => setSelectedFilter('showcase')}
-              >
-                <Play className="w-3 h-3 mr-1" />
-                Showcases
-              </Badge>
-              <Badge
-                variant={selectedFilter === 'looking-for' ? 'default' : 'outline'}
-                className="cursor-pointer whitespace-nowrap"
-                onClick={() => setSelectedFilter('looking-for')}
-              >
-                <Search className="w-3 h-3 mr-1" />
-                Looking For
-              </Badge>
-              <Badge
-                variant={selectedFilter === 'jam-session' ? 'default' : 'outline'}
-                className="cursor-pointer whitespace-nowrap"
-                onClick={() => setSelectedFilter('jam-session')}
-              >
-                <Calendar className="w-3 h-3 mr-1" />
-                Jam Sessions
-              </Badge>
-            </div>
-          </div>
+          <Avatar className="h-12 w-12 border-2 border-white shadow">
+            <img 
+              src={currentUser.avatar} 
+              alt={currentUser.name} 
+              className="object-cover"
+            />
+          </Avatar>
         </div>
-
-        {/* Posts */}
-        <div className="space-y-4">
-          {filteredPosts.length === 0 ? (
-            <Card className="p-8 text-center">
-              <Music className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-              <h3 className="font-semibold text-gray-900 mb-2">No posts found</h3>
-              <p className="text-gray-600">Try adjusting your search or filters</p>
-            </Card>
-          ) : (
-            filteredPosts.map((post) => (
-              <Card key={post.id} className="overflow-hidden">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center space-x-3">
-                      <Avatar>
-                        <AvatarImage src={post.musician.avatar} />
-                        <AvatarFallback>
-                          {post.musician.name.split(' ').map(n => n[0]).join('')}
-                        </AvatarFallback>
-                      </Avatar>
+        
+        {/* Search */}
+        <div className="relative mt-6">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-4 w-4 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            placeholder="Search posts, musicians, or tags..."
+            className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+        
+        {/* Filter Tabs */}
+        <div className="flex mt-6 overflow-x-auto gap-2 pb-1 scrollbar-hide">
+          <button
+            onClick={() => setSelectedFilter('all')}
+            className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition ${
+              selectedFilter === 'all' 
+                ? 'bg-blue-500 text-white' 
+                : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            All Posts
+          </button>
+          
+          <button
+            onClick={() => setSelectedFilter('collaboration')}
+            className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium flex items-center gap-1.5 transition ${
+              selectedFilter === 'collaboration' 
+                ? 'bg-blue-500 text-white' 
+                : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            <Users className="w-3.5 h-3.5" /> Collaborations
+          </button>
+          
+          <button
+            onClick={() => setSelectedFilter('showcase')}
+            className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium flex items-center gap-1.5 transition ${
+              selectedFilter === 'showcase' 
+                ? 'bg-blue-500 text-white' 
+                : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            <Video className="w-3.5 h-3.5" /> Showcases
+          </button>
+          
+          <button
+            onClick={() => setSelectedFilter('looking-for')}
+            className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium flex items-center gap-1.5 transition ${
+              selectedFilter === 'looking-for' 
+                ? 'bg-blue-500 text-white' 
+                : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            <SearchIcon className="w-3.5 h-3.5" /> Looking For
+          </button>
+          
+          <button
+            onClick={() => setSelectedFilter('jam-session')}
+            className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium flex items-center gap-1.5 transition ${
+              selectedFilter === 'jam-session' 
+                ? 'bg-blue-500 text-white' 
+                : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            <Calendar className="w-3.5 h-3.5" /> Jam Sessions
+          </button>
+        </div>
+        
+        {/* Empty state or loading state */}
+        {isLoading ? (
+          <div className="space-y-4 mt-6">
+            {[1, 2].map(i => (
+              <div key={i} className="border border-gray-200 rounded-xl p-4 bg-white">
+                <div className="flex items-start gap-3">
+                  <Skeleton className="h-10 w-10 rounded-full" />
+                  <div className="space-y-2 flex-1">
+                    <Skeleton className="h-4 w-1/4" />
+                    <Skeleton className="h-3 w-1/3" />
+                    <Skeleton className="h-20 w-full" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filteredPosts.length === 0 ? (
+          <div className="mt-16 text-center bg-white p-8 rounded-xl border border-gray-200 shadow-sm">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-600 mb-4">
+              <Users className="h-6 w-6" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900">No posts yet</h3>
+            <p className="mt-1 text-gray-500">
+              {selectedFilter === 'all' 
+                ? 'Be the first to post and connect with other musicians!' 
+                : `No ${selectedFilter} posts available. Create one to get started!`}
+            </p>
+            <div className="mt-6">
+              <button 
+                className="inline-flex items-center px-4 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+              >
+                Create a Post
+              </button>
+            </div>
+          </div>
+        ) : (
+          // This part won't render because we're keeping posts empty
+          <div className="mt-6 space-y-4">
+            {/* Example post from image */}
+            <article className="border border-gray-200 rounded-xl overflow-hidden bg-white">
+              {/* Post header */}
+              <div className="p-4">
+                <div className="flex items-start">
+                  {/* SC initials */}
+                  <div className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full text-gray-800 font-semibold">
+                    SC
+                  </div>
+                  <div className="ml-3 flex-1">
+                    <div className="flex justify-between items-start">
                       <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold">{post.musician.name}</h3>
-                          <Badge variant="secondary" className="text-xs">
-                            {post.musician.experience}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-gray-600">{post.musician.username}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <div className="flex items-center gap-1">
-                            <MapPin className="w-3 h-3 text-gray-400" />
-                            <span className="text-xs text-gray-500">{post.musician.location}</span>
-                          </div>
-                          <span className="text-xs text-gray-400">•</span>
-                          <div className="flex items-center gap-1">
-                            <Clock className="w-3 h-3 text-gray-400" />
-                            <span className="text-xs text-gray-500">{post.timestamp}</span>
-                          </div>
-                        </div>
+                        <h3 className="text-gray-900 font-medium">Sarah Chen</h3>
+                        <p className="text-gray-500 text-sm">@sarahdrums</p>
+                      </div>
+                      <span className="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded">
+                        Professional
+                      </span>
+                    </div>
+                    <div className="flex items-center text-xs text-gray-500 mt-1">
+                      <div className="flex items-center">
+                        <MapPin size={12} className="mr-1" />
+                        Los Angeles, CA
+                      </div>
+                      <span className="mx-1.5">•</span>
+                      <div className="flex items-center">
+                        <Clock size={12} className="mr-1" />
+                        556d ago
                       </div>
                     </div>
-                    <Badge variant="outline" className={`${getPostTypeColor(post.type)} border-0`}>
-                      {getPostTypeIcon(post.type)}
-                      <span className="ml-1">{formatPostType(post.type)}</span>
-                    </Badge>
                   </div>
-                </CardHeader>
-
-                <CardContent className="pt-0">
-                  <p className="text-gray-900 mb-3">{post.content}</p>
-
-                  {/* Media */}
-                  {post.media && (
-                    <div className="mb-4">
-                      {post.media.type === 'audio' && (
-                        <div className="bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg p-4 flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
-                              <Headphones className="w-6 h-6 text-purple-600" />
-                            </div>
-                            <div>
-                              <p className="font-medium">Audio Track</p>
-                              <p className="text-sm text-gray-600">{post.media.duration}</p>
-                            </div>
-                          </div>
-                          <Button size="sm" variant="outline">
-                            <Play className="w-4 h-4 mr-1" />
-                            Play
-                          </Button>
-                        </div>
-                      )}
-                      {post.media.type === 'video' && (
-                        <div className="relative rounded-lg overflow-hidden">
-                          <img 
-                            src={post.media.url} 
-                            alt="Video thumbnail"
-                            className="w-full h-48 object-cover"
-                          />
-                          <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-                            <div className="w-16 h-16 bg-white bg-opacity-90 rounded-full flex items-center justify-center">
-                              <Play className="w-6 h-6 text-gray-800 ml-1" />
-                            </div>
-                          </div>
-                          <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">
-                            {post.media.duration}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Instruments/Tags */}
-                  <div className="flex flex-wrap gap-1 mb-4">
-                    {post.musician.instruments.slice(0, 3).map((instrument) => (
-                      <Badge key={instrument} variant="secondary" className="text-xs">
-                        {instrument}
-                      </Badge>
-                    ))}
-                    {post.tags.map((tag) => (
-                      <Badge key={tag} variant="outline" className="text-xs">
-                        #{tag}
-                      </Badge>
-                    ))}
+                </div>
+              </div>
+              
+              {/* Post content */}
+              <div className="px-4 pb-4">
+                <p className="text-gray-800 mb-3">
+                  Looking for a bassist and keyboardist to complete our jazz fusion trio! We have 
+                  some gigs lined up for next month. Must be able to rehearse twice a week in 
+                  downtown LA.
+                </p>
+                
+                {/* Tags */}
+                <div className="flex flex-wrap gap-1.5 mb-4">
+                  <Badge className="bg-gray-100 text-gray-800 rounded-md font-normal">Drums</Badge>
+                  <Badge className="bg-gray-100 text-gray-800 rounded-md font-normal">Percussion</Badge>
+                  <Badge className="bg-blue-100 text-blue-800 rounded-md font-normal">#jazz</Badge>
+                  <Badge className="bg-blue-100 text-blue-800 rounded-md font-normal">#fusion</Badge>
+                  <Badge className="bg-blue-100 text-blue-800 rounded-md font-normal">#trio</Badge>
+                  <Badge className="bg-blue-100 text-blue-800 rounded-md font-normal">#gigs</Badge>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <div className="flex space-x-6">
+                    <button className="flex items-center text-gray-500 text-sm">
+                      <Heart className="h-4 w-4 mr-1.5" />
+                      <span>23</span>
+                    </button>
+                    <button className="flex items-center text-gray-500 text-sm">
+                      <MessageSquare className="h-4 w-4 mr-1.5" />
+                      <span>8</span>
+                    </button>
+                    <button className="flex items-center text-gray-500 text-sm">
+                      <Share2 className="h-4 w-4 mr-1.5" />
+                      <span>Share</span>
+                    </button>
                   </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center justify-between pt-2 border-t">
-                    <div className="flex items-center space-x-4">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleLike(post.id)}
-                        className={`${
-                          likedPosts.has(post.id) || post.isLiked
-                            ? 'text-red-500 hover:text-red-600'
-                            : 'text-gray-500 hover:text-red-500'
-                        }`}
-                      >
-                        <Heart 
-                          className={`w-4 h-4 mr-1 ${
-                            likedPosts.has(post.id) || post.isLiked ? 'fill-current' : ''
-                          }`} 
-                        />
-                        {post.likes + (likedPosts.has(post.id) ? 1 : 0)}
-                      </Button>
-                      <Button variant="ghost" size="sm" className="text-gray-500 hover:text-blue-600">
-                        <MessageCircle className="w-4 h-4 mr-1" />
-                        {post.comments}
-                      </Button>
-                      <Button variant="ghost" size="sm" className="text-gray-500 hover:text-green-600">
-                        <Share className="w-4 h-4 mr-1" />
-                        Share
-                      </Button>
-                    </div>
-                    
-                    {post.type === 'collaboration' || post.type === 'looking-for' ? (
-                      <Button size="sm" variant="outline">
-                        Join Project
-                      </Button>
-                    ) : post.type === 'jam-session' ? (
-                      <Button size="sm" variant="outline">
-                        I'm Interested
-                      </Button>
-                    ) : (
-                      <Button size="sm" variant="outline">
-                        Connect
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </div>
+                  <button className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    Join Project
+                  </button>
+                </div>
+              </div>
+            </article>
+          </div>
+        )}
       </div>
     </div>
   );
