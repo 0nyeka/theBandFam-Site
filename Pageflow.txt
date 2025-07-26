@@ -1,0 +1,78 @@
+1. Landing Page (Homepage)
+Purpose: Introduce the platform, value proposition, and key features.
+Include: tagline, testimonials, call-to-action buttons (Sign Up / Log In).
+Build early for design cohesion and user onboarding.
+
+🔹 2. Authentication Pages
+Signup Page
+Form for username, email, password, and optionally role (musician, vocalist, producer, etc.)
+Login Page
+Forgot Password / Reset Password Pages
+
+🔹 3. User Dashboard
+Post-login landing page summarizing recent activity, messages, updates, or event invites.
+Acts as the user’s hub for all actions.
+
+🔹 4. Profile Pages
+Your Profile Page (editable)
+Bio, location, instruments, genres, demo tracks, availability.
+Other Users’ Profile Page (view-only)
+Public-facing profile for networking and discovery.
+
+🔹 5. Search / Discover Page
+Filters by:
+Instrument, genre, location, availability and musician names
+Core to connecting users with collaborators.
+May include map view or tags.
+
+🔹 6. Messaging / Chat Page
+Enables real-time or asynchronous communication.
+Could be one-on-one or group messaging.
+
+🔹 7. Project / Collaboration Page
+Users can create or join projects.
+Add tracks, notes, deadlines, collaborators.
+Can include version history or Dropbox/Google Drive integration.
+
+🔹 8. Event Scheduling / Calendar
+Schedule rehearsals, gigs, or studio time.
+Integration with Google Calendar or in-site reminders.
+
+🔹 9. Showcase / Portfolio Page
+Display songs, videos, photos, past gigs.
+Like a music-specific LinkedIn “portfolio.”
+
+🔹 10. Notifications Panel
+Alerts for messages, invites, comments, and new followers.
+
+🔹 11. Settings Page
+Account settings, password change, privacy options, email preferences.
+
+🔹 12. Admin Panel (if applicable)
+For moderation, reporting, and managing user behavior/content.
+
+Optional Extras (after MVP):
+Feed / Activity Wall – See recent posts, updates, track uploads.
+Monetization – Add payment integrations for selling beats, lessons, or paid collaborations.
+
+Production Phases
+1. Page Order & MVP Milestone Phases
+Phase 1: MVP Core Flow 
+Landing Page
+Signup/Login
+User Dashboard
+Profile (create/edit)
+Search / Discover Users
+Basic Messaging
+
+Phase 2: Engagement & Collaboration 
+Project / Collaboration Page
+Messaging enhancements (attachments, media)
+Calendar / Event Scheduler
+Showcase / Portfolio Page
+
+Phase 3: Extras & Admin 
+Notifications Panel
+Settings Page
+Admin Dashboard?
+Feed / Blog / Music News (Optional)
