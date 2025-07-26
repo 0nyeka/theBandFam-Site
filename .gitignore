@@ -64,6 +64,9 @@ coverage/
 # Yarn Integrity file
 .yarn-integrity
 
+# dotenv environment variables file
+.env.local
+
 # next.js build output
 .next
 
