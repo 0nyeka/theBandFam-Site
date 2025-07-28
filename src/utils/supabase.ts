@@ -134,3 +134,151 @@ export const markConversationAsRead = async (conversationId: string, userId: str
   }
 };
 
+// Create profile after signup
+export const createProfile = async (userId: string, profileData: any) => {
+  try {
+    // First check if a profile already exists for this user
+    const { data: existingProfile } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('user_id', userId)
+      .single();
+
+    if (existingProfile) {
+      console.log('Profile already exists for this user');
+      return { profile: existingProfile, error: null };
+    }
+
+    // Insert new profile
+    const { data, error } = await supabase
+      .from('profiles')
+      .insert({
+        user_id: userId,
+        display_name: profileData.display_name,
+        bio: profileData.bio || null,
+        location: profileData.location || null,
+        availability_status: profileData.availability_status || 'available',
+        profile_image_url: profileData.profile_image_url || null
+        // created_at and updated_at will be handled by default values
+      })
+      .select();
+      
+    if (error) {
+      console.error('Error creating profile:', error);
+      return { profile: null, error };
+    }
+    
+    return { profile: data[0], error: null };
+  } catch (error) {
+    console.error('Exception creating profile:', error);
+    return { profile: null, error };
+  }
+};
+
+// Fetch user profile
+export const fetchProfile = async (userId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+      
+    if (error) throw error;
+    
+    return { profile: data, error: null };
+  } catch (error) {
+    console.error('Error fetching profile:', error);
+    return { profile: null, error };
+  }
+};
+
+// Update user profile
+export const updateProfile = async (userId: string, profileData: any) => {
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .update(profileData)
+      .eq('user_id', userId)
+      .select();
+      
+    if (error) throw error;
+    
+    return { profile: data[0], error: null };
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    return { profile: null, error };
+  }
+};
+
+// Update user settings
+export const updateUserSettings = async (userId: string, settingsData: any) => {
+  try {
+    // Check if settings exist for this user
+    const { data: existingSettings } = await supabase
+      .from('user_settings')
+      .select()
+      .eq('user_id', userId)
+      .maybeSingle();
+      
+    let result;
+    
+    if (existingSettings) {
+      // Update existing settings
+      result = await supabase
+        .from('user_settings')
+        .update(settingsData)
+        .eq('user_id', userId)
+        .select();
+    } else {
+      // Create new settings
+      result = await supabase
+        .from('user_settings')
+        .insert({
+          user_id: userId,
+          ...settingsData
+        })
+        .select();
+    }
+    
+    if (result.error) throw result.error;
+    
+    return { settings: result.data[0], error: null };
+  } catch (error) {
+    console.error('Error updating user settings:', error);
+    return { settings: null, error };
+  }
+};
+
+// Password reset request
+export const requestPasswordReset = async (email: string) => {
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    
+    if (error) throw error;
+    
+    return { success: true, error: null };
+  } catch (error) {
+    console.error('Error requesting password reset:', error);
+    return { success: false, error };
+  }
+};
+
+// Update password
+export const updatePassword = async (newPassword: string) => {
+  try {
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+    
+    if (error) throw error;
+    
+    return { success: true, error: null };
+  } catch (error) {
+    console.error('Error updating password:', error);
+    return { success: false, error };
+  }
+};
+
