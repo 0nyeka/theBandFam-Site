@@ -10,14 +10,22 @@ import {
   EyeOff, 
   ArrowLeft,
   MapPin,
-  Info
+  Info,
+  Music,
+  Settings,
+  Home,
+  Users,
+  Calendar,
+  MessageSquare,
+  Compass
 } from 'lucide-react';
 import { 
   getCurrentUser, 
   fetchProfile, 
   updateProfile,
   updatePassword,
-  updateUserSettings
+  updateUserSettings,
+  signOut
 } from '../utils/supabase.ts';
 import { Button } from './ui/button.tsx';
 import { Input } from './ui/input.tsx';
@@ -70,12 +78,6 @@ const AccountSettings = () => {
         if (profile) {
           setProfile(profile);
         }
-        
-        // TODO: Fetch settings when implemented
-        // const { settings } = await fetchUserSettings(user.id);
-        // if (settings) {
-        //   setSettings(settings);
-        // }
       } catch (error) {
         console.error('Error loading user data:', error);
       } finally {
@@ -85,6 +87,11 @@ const AccountSettings = () => {
     
     loadUserData();
   }, [navigate]);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   const handleProfileUpdate = async () => {
     setError(null);
@@ -163,311 +170,528 @@ const AccountSettings = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p>Loading account settings...</p>
+      <div className="dashboard-container">
+        <nav className="top-nav">
+          <div className="nav-left">
+            <div className="logo">
+              <Music className="h-6 w-6" style={{color: 'var(--accent-color)'}} />
+              <span>MusicConnect</span>
+            </div>
+          </div>
+        </nav>
+        <div className="main-content">
+          <div style={{gridColumn: '1 / -1', textAlign: 'center', padding: '40px'}}>
+            <p>Loading settings...</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-        <div className="flex items-center mb-6">
-          <Button 
-            variant="ghost" 
-            className="mr-2"
-            onClick={() => navigate('/dashboard')}
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" /> Back to Dashboard
-          </Button>
+    <div className="dashboard-container">
+      {/* Top Navigation */}
+      <nav className="top-nav">
+        <div className="nav-left">
+          <div className="logo">
+            <Music className="h-6 w-6" style={{color: 'var(--accent-color)'}} />
+            <span>MusicConnect</span>
+          </div>
         </div>
         
-        <h1 className="text-2xl font-bold mb-6">Account Settings</h1>
-        
-        {error && (
-          <div className="p-3 bg-red-50 text-red-700 rounded-md mb-4">
-            {error}
+        <div className="nav-right">
+          <div className="nav-icons">
+            <span className="icon" onClick={() => navigate('/dashboard')}>
+              <Home size={18} />
+            </span>
+            <span className="icon"><Users size={18} /></span>
+            <span className="icon"><Calendar size={18} /></span>
+            <span className="notification-icon">
+              <Bell size={18} />
+              <span className="badge">5</span>
+            </span>
+            <span className="notification-icon">
+              <MessageSquare size={18} />
+              <span className="badge">3</span>
+            </span>
           </div>
-        )}
-        
-        {success && (
-          <div className="p-3 bg-green-50 text-green-700 rounded-md mb-4">
-            {success}
+          <div className="user-avatar">
+            <Avatar className="h-8 w-8">
+              <AvatarFallback style={{backgroundColor: 'var(--accent-color)', color: 'white'}}>
+                {user?.email?.charAt(0).toUpperCase() || "U"}
+              </AvatarFallback>
+            </Avatar>
           </div>
-        )}
-        
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="mb-6 grid w-full grid-cols-3">
-            <TabsTrigger value="profile" className="flex items-center">
-              <User className="h-4 w-4 mr-2" /> Profile
-            </TabsTrigger>
-            <TabsTrigger value="password" className="flex items-center">
-              <Lock className="h-4 w-4 mr-2" /> Password
-            </TabsTrigger>
-            <TabsTrigger value="notifications" className="flex items-center">
-              <Bell className="h-4 w-4 mr-2" /> Preferences
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="profile">
-            <Card>
-              <CardHeader>
-                <CardTitle>Profile Information</CardTitle>
-                <CardDescription>
-                  Update your profile details and how others see you on MuseConnect
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex flex-col md:flex-row md:items-center gap-4">
-                  <Avatar className="h-20 w-20">
-                    {profile.profile_image_url ? (
-                      <AvatarImage src={profile.profile_image_url} alt="Profile" />
-                    ) : (
-                      <AvatarFallback className="text-xl bg-indigo-600 text-white">
-                        {profile.display_name?.charAt(0) || user.email?.charAt(0).toUpperCase()}
-                      </AvatarFallback>
-                    )}
+        </div>
+      </nav>
+
+      <div className="main-content">
+        {/* Left Sidebar */}
+        <aside className="left-sidebar">
+          <div className="user-profile">
+            <Avatar className="profile-img">
+              <AvatarFallback style={{backgroundColor: 'var(--accent-color)', color: 'white'}}>
+                {user?.email?.charAt(0).toUpperCase() || "U"}
+              </AvatarFallback>
+            </Avatar>
+            <h3>{user?.email || "User"}</h3>
+            <p>Musician</p>
+          </div>
+
+          <nav className="sidebar-nav">
+            <a 
+              href="#" 
+              className="nav-item"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/dashboard');
+              }}
+            >
+              <span><Home size={16} /> Home</span>
+            </a>
+            
+            <a 
+              href="#" 
+              className="nav-item"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/dashboard');
+              }}
+            >
+              <span><Users size={16} /> My Network</span>
+            </a>
+            
+            <a 
+              href="#" 
+              className="nav-item"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/dashboard');
+              }}
+            >
+              <span><Calendar size={16} /> Events</span>
+            </a>
+            
+            <a 
+              href="#" 
+              className="nav-item"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/dashboard');
+              }}
+            >
+              <span><Music size={16} /> My Music</span>
+            </a>
+            
+            <a 
+              href="#" 
+              className="nav-item"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/dashboard');
+              }}
+            >
+              <span><Compass size={16} /> Discover</span>
+            </a>
+            
+            <a href="#" className="nav-item active">
+              <span><Settings size={16} /> Settings</span>
+            </a>
+          </nav>
+        </aside>
+
+        {/* Main Content */}
+        <main className="feed">
+          <div className="post">
+            <div style={{display: 'flex', alignItems: 'center', marginBottom: '24px'}}>
+              <button 
+                onClick={() => navigate('/dashboard')}
+                className="action-btn"
+                style={{marginRight: '16px'}}
+              >
+                <ArrowLeft size={16} style={{marginRight: '8px'}} />
+                Back to Dashboard
+              </button>
+              <h1 style={{margin: 0, fontSize: '24px', fontWeight: 'bold'}}>Settings</h1>
+            </div>
+            
+            <p style={{color: 'var(--text-secondary)', marginBottom: '24px'}}>
+              Manage your account and preferences
+            </p>
+
+            {error && (
+              <div style={{
+                padding: '12px',
+                backgroundColor: '#fef2f2',
+                color: '#dc2626',
+                borderRadius: '8px',
+                marginBottom: '16px',
+                fontSize: '14px'
+              }}>
+                {error}
+              </div>
+            )}
+            
+            {success && (
+              <div style={{
+                padding: '12px',
+                backgroundColor: '#f0f9ff',
+                color: '#0284c7',
+                borderRadius: '8px',
+                marginBottom: '16px',
+                fontSize: '14px'
+              }}>
+                {success}
+              </div>
+            )}
+
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <div style={{
+                display: 'flex',
+                borderBottom: '1px solid var(--border-color)',
+                marginBottom: '24px'
+              }}>
+                <button
+                  className={`action-btn ${activeTab === 'profile' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('profile')}
+                  style={{
+                    padding: '12px 16px',
+                    backgroundColor: activeTab === 'profile' ? 'var(--hover-bg)' : 'transparent',
+                    borderBottom: activeTab === 'profile' ? '2px solid var(--accent-color)' : 'none'
+                  }}
+                >
+                  <User size={16} style={{marginRight: '8px'}} />
+                  Profile Settings
+                </button>
+                
+                <button
+                  className={`action-btn ${activeTab === 'password' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('password')}
+                  style={{
+                    padding: '12px 16px',
+                    backgroundColor: activeTab === 'password' ? 'var(--hover-bg)' : 'transparent',
+                    borderBottom: activeTab === 'password' ? '2px solid var(--accent-color)' : 'none'
+                  }}
+                >
+                  <Lock size={16} style={{marginRight: '8px'}} />
+                  Change Password
+                </button>
+                
+                <button
+                  className={`action-btn ${activeTab === 'notifications' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('notifications')}
+                  style={{
+                    padding: '12px 16px',
+                    backgroundColor: activeTab === 'notifications' ? 'var(--hover-bg)' : 'transparent',
+                    borderBottom: activeTab === 'notifications' ? '2px solid var(--accent-color)' : 'none'
+                  }}
+                >
+                  <Bell size={16} style={{marginRight: '8px'}} />
+                  Music Preferences
+                </button>
+              </div>
+
+              <TabsContent value="profile">
+                <div style={{display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px'}}>
+                  <Avatar style={{width: '80px', height: '80px'}}>
+                    <AvatarFallback style={{backgroundColor: 'var(--accent-color)', color: 'white', fontSize: '24px'}}>
+                      {profile.display_name?.charAt(0) || user.email?.charAt(0).toUpperCase()}
+                    </AvatarFallback>
                   </Avatar>
-                  <div className="flex-1">
-                    <Button variant="outline" size="sm">
-                      Upload Photo
-                    </Button>
+                  <div>
+                    <button className="action-btn">Change Photo</button>
+                    <button className="action-btn" style={{marginLeft: '8px'}}>Remove Photo</button>
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="displayName">Display Name</Label>
-                  <Input
-                    id="displayName"
-                    value={profile.display_name || ''}
-                    onChange={(e) => setProfile({...profile, display_name: e.target.value})}
-                    placeholder="How others will see you"
-                    className="w-full"
-                  />
+                <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px'}}>
+                  <div>
+                    <label style={{display: 'block', marginBottom: '8px', fontWeight: '500'}}>First Name</label>
+                    <input
+                      type="text"
+                      value={profile.display_name?.split(' ')[0] || ''}
+                      onChange={(e) => {
+                        const lastName = profile.display_name?.split(' ').slice(1).join(' ') || '';
+                        setProfile({...profile, display_name: `${e.target.value} ${lastName}`.trim()});
+                      }}
+                      placeholder="John"
+                      style={{
+                        width: '100%',
+                        padding: '8px 12px',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '6px',
+                        outline: 'none',
+                        backgroundColor: 'var(--sidebar-bg)'
+                      }}
+                    />
+                  </div>
+                  
+                  <div>
+                    <label style={{display: 'block', marginBottom: '8px', fontWeight: '500'}}>Last Name</label>
+                    <input
+                      type="text"
+                      value={profile.display_name?.split(' ').slice(1).join(' ') || ''}
+                      onChange={(e) => {
+                        const firstName = profile.display_name?.split(' ')[0] || '';
+                        setProfile({...profile, display_name: `${firstName} ${e.target.value}`.trim()});
+                      }}
+                      placeholder="Doe"
+                      style={{
+                        width: '100%',
+                        padding: '8px 12px',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '6px',
+                        outline: 'none',
+                        backgroundColor: 'var(--sidebar-bg)'
+                      }}
+                    />
+                  </div>
                 </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
+
+                <div style={{marginBottom: '16px'}}>
+                  <label style={{display: 'block', marginBottom: '8px', fontWeight: '500'}}>Email</label>
+                  <input
+                    type="email"
                     value={user.email}
                     disabled
-                    className="w-full bg-gray-50"
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '6px',
+                      outline: 'none',
+                      backgroundColor: '#f3f4f6',
+                      color: 'var(--text-secondary)'
+                    }}
                   />
-                  <p className="text-xs text-gray-500">Email cannot be changed</p>
                 </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="location">Location</Label>
-                  <div className="relative">
-                    <MapPin className="absolute top-2.5 left-3 h-5 w-5 text-gray-400" />
-                    <Input
-                      id="location"
-                      value={profile.location || ''}
-                      onChange={(e) => setProfile({...profile, location: e.target.value})}
-                      placeholder="City, Country"
-                      className="w-full pl-10"
-                    />
-                  </div>
+
+                <div style={{marginBottom: '16px'}}>
+                  <label style={{display: 'block', marginBottom: '8px', fontWeight: '500'}}>Primary Instrument</label>
+                  <select
+                    value={profile.primary_instrument || 'Bass Guitar'}
+                    onChange={(e) => setProfile({...profile, primary_instrument: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '6px',
+                      outline: 'none',
+                      backgroundColor: 'var(--sidebar-bg)'
+                    }}
+                  >
+                    <option value="Bass Guitar">Bass Guitar</option>
+                    <option value="Guitar">Guitar</option>
+                    <option value="Drums">Drums</option>
+                    <option value="Vocals">Vocals</option>
+                    <option value="Piano">Piano</option>
+                    <option value="Violin">Violin</option>
+                  </select>
                 </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="bio">Bio</Label>
-                  <Textarea
-                    id="bio"
+
+                <div style={{marginBottom: '16px'}}>
+                  <label style={{display: 'block', marginBottom: '8px', fontWeight: '500'}}>Bio</label>
+                  <textarea
                     value={profile.bio || ''}
                     onChange={(e) => setProfile({...profile, bio: e.target.value})}
-                    placeholder="Tell others about yourself and your musical background"
+                    placeholder="Passionate bass player with 10+ years of experience. Love jazz fusion and funk. Always looking for new collaboration opportunities!"
                     rows={4}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '6px',
+                      outline: 'none',
+                      backgroundColor: 'var(--sidebar-bg)',
+                      resize: 'vertical'
+                    }}
                   />
                 </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="availability">Availability</Label>
-                  <Select 
-                    value={profile.availability_status || 'available'} 
-                    onValueChange={(value) => setProfile({...profile, availability_status: value})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select availability" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="available">Available for projects</SelectItem>
-                      <SelectItem value="busy">Currently busy</SelectItem>
-                      <SelectItem value="not_available">Not available</SelectItem>
-                    </SelectContent>
-                  </Select>
+
+                <div style={{marginBottom: '24px'}}>
+                  <label style={{display: 'block', marginBottom: '8px', fontWeight: '500'}}>Location</label>
+                  <input
+                    type="text"
+                    value={profile.location || ''}
+                    onChange={(e) => setProfile({...profile, location: e.target.value})}
+                    placeholder="Los Angeles, CA"
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '6px',
+                      outline: 'none',
+                      backgroundColor: 'var(--sidebar-bg)'
+                    }}
+                  />
                 </div>
-                
-                <Button 
+
+                <button 
                   onClick={handleProfileUpdate}
                   disabled={saveLoading}
-                  className="w-full sm:w-auto"
+                  className="post-btn"
+                  style={{marginRight: '12px'}}
                 >
-                  {saveLoading ? 'Saving...' : 'Save Changes'}
-                </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="password">
-            <Card>
-              <CardHeader>
-                <CardTitle>Update Password</CardTitle>
-                <CardDescription>
-                  Change your password to keep your account secure
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="currentPassword">Current Password</Label>
-                  <div className="relative">
-                    <Input
-                      id="currentPassword"
-                      type={showPasswords ? "text" : "password"}
-                      value={currentPassword}
-                      onChange={(e) => setCurrentPassword(e.target.value)}
-                      placeholder="Enter your current password"
-                      className="w-full pr-10"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPasswords(!showPasswords)}
-                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
-                    >
-                      {showPasswords ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                    </button>
+                  {saveLoading ? 'Saving...' : 'Save Profile Changes'}
+                </button>
+              </TabsContent>
+
+              <TabsContent value="password">
+                <div style={{marginBottom: '24px'}}>
+                  <h3 style={{marginBottom: '16px', fontSize: '18px'}}>Change Password</h3>
+                  
+                  <div style={{marginBottom: '16px'}}>
+                    <label style={{display: 'block', marginBottom: '8px', fontWeight: '500'}}>Current Password</label>
+                    <div style={{position: 'relative'}}>
+                      <input
+                        type={showPasswords ? "text" : "password"}
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        placeholder="Enter your current password"
+                        style={{
+                          width: '100%',
+                          padding: '8px 40px 8px 12px',
+                          border: '1px solid var(--border-color)',
+                          borderRadius: '6px',
+                          outline: 'none',
+                          backgroundColor: 'var(--sidebar-bg)'
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPasswords(!showPasswords)}
+                        style={{
+                          position: 'absolute',
+                          right: '12px',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          color: 'var(--text-secondary)'
+                        }}
+                      >
+                        {showPasswords ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
                   </div>
-                </div>
-                
-                <Separator />
-                
-                <div className="space-y-2">
-                  <Label htmlFor="newPassword">New Password</Label>
-                  <div className="relative">
-                    <Input
-                      id="newPassword"
+
+                  <div style={{marginBottom: '16px'}}>
+                    <label style={{display: 'block', marginBottom: '8px', fontWeight: '500'}}>New Password</label>
+                    <input
                       type={showPasswords ? "text" : "password"}
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       placeholder="Create a new password"
-                      className="w-full pr-10"
+                      style={{
+                        width: '100%',
+                        padding: '8px 12px',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '6px',
+                        outline: 'none',
+                        backgroundColor: 'var(--sidebar-bg)'
+                      }}
                     />
+                    <p style={{fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px'}}>
+                      Password must be at least 8 characters
+                    </p>
                   </div>
-                  <p className="text-xs text-gray-500">Password must be at least 8 characters</p>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                  <div className="relative">
-                    <Input
-                      id="confirmPassword"
+
+                  <div style={{marginBottom: '24px'}}>
+                    <label style={{display: 'block', marginBottom: '8px', fontWeight: '500'}}>Confirm New Password</label>
+                    <input
                       type={showPasswords ? "text" : "password"}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Confirm your new password"
-                      className="w-full pr-10"
+                      style={{
+                        width: '100%',
+                        padding: '8px 12px',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '6px',
+                        outline: 'none',
+                        backgroundColor: 'var(--sidebar-bg)'
+                      }}
                     />
                   </div>
+
+                  <button 
+                    onClick={handlePasswordUpdate}
+                    disabled={saveLoading || !currentPassword || !newPassword || !confirmPassword}
+                    className="post-btn"
+                  >
+                    {saveLoading ? 'Updating...' : 'Update Password'}
+                  </button>
                 </div>
-                
-                <Button 
-                  onClick={handlePasswordUpdate}
-                  disabled={saveLoading || !currentPassword || !newPassword || !confirmPassword}
-                  className="w-full sm:w-auto"
-                >
-                  {saveLoading ? 'Updating...' : 'Update Password'}
-                </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="notifications">
-            <Card>
-              <CardHeader>
-                <CardTitle>Notification & Privacy Settings</CardTitle>
-                <CardDescription>
-                  Manage how you receive notifications and control your privacy
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  <h3 className="font-medium">Email Notifications</h3>
+              </TabsContent>
+
+              <TabsContent value="notifications">
+                <div style={{marginBottom: '24px'}}>
+                  <h3 style={{marginBottom: '16px', fontSize: '18px'}}>
+                    <Music size={16} style={{marginRight: '8px', verticalAlign: 'middle'}} />
+                    Music Preferences
+                  </h3>
                   
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label htmlFor="email-notifications" className="font-normal">
-                        Email notifications
-                      </Label>
-                      <p className="text-sm text-gray-500">
-                        Receive email notifications about new messages and invites
-                      </p>
+                  <div style={{marginBottom: '24px'}}>
+                    <h4 style={{marginBottom: '12px', fontSize: '16px'}}>Favorite Genres (select up to 5)</h4>
+                    
+                    <div style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px'}}>
+                      {/*
+                        TODO: Replace with dynamic genre options
+                      */}
+                      {['Jazz', 'Rock', 'Blues', 'Classical', 'Electronic', 'Reggae', 'Folk', 'Hip Hop', 'Country'].map((genre) => (
+                        <label key={genre} style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                          <input
+                            type="checkbox"
+                            defaultChecked={['Jazz', 'Rock', 'Blues'].includes(genre)}
+                            style={{
+                              width: '16px',
+                              height: '16px',
+                              accentColor: 'var(--accent-color)'
+                            }}
+                          />
+                          <span style={{fontSize: '14px'}}>{genre}</span>
+                        </label>
+                      ))}
                     </div>
-                    <Switch 
-                      id="email-notifications"
-                      checked={settings.email_notifications}
-                      onCheckedChange={(checked) => setSettings({...settings, email_notifications: checked})}
-                    />
                   </div>
+
+                  <button 
+                    onClick={handleSettingsUpdate}
+                    disabled={saveLoading}
+                    className="post-btn"
+                  >
+                    {saveLoading ? 'Saving...' : 'Save Profile Changes'}
+                  </button>
                 </div>
-                
-                <Separator />
-                
-                <div className="space-y-4">
-                  <h3 className="font-medium">Privacy Settings</h3>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="privacy">Profile Privacy</Label>
-                    <Select 
-                      value={settings.privacy_level} 
-                      onValueChange={(value) => setSettings({...settings, privacy_level: value})}
-                    >
-                      <SelectTrigger id="privacy">
-                        <SelectValue placeholder="Select privacy level" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="public">Public - Anyone can view your profile</SelectItem>
-                        <SelectItem value="registered">Registered - Only MuseConnect users can view your profile</SelectItem>
-                        <SelectItem value="private">Private - Only connections can view your profile</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                
-                <Separator />
-                
-                <div className="space-y-4">
-                  <h3 className="font-medium">Appearance</h3>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="theme">Theme</Label>
-                    <Select 
-                      value={settings.theme_preference} 
-                      onValueChange={(value) => setSettings({...settings, theme_preference: value})}
-                    >
-                      <SelectTrigger id="theme">
-                        <SelectValue placeholder="Select theme" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="light">Light</SelectItem>
-                        <SelectItem value="dark">Dark</SelectItem>
-                        <SelectItem value="system">System</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                
-                <Button 
-                  onClick={handleSettingsUpdate}
-                  disabled={saveLoading}
-                  className="w-full sm:w-auto"
-                >
-                  {saveLoading ? 'Saving...' : 'Save Preferences'}
-                </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </main>
+
+        {/* Right Sidebar - Empty for settings */}
+        <aside className="right-sidebar">
+          <div>
+            <h3 style={{marginBottom: '16px', fontSize: '16px'}}>
+              <Info size={16} style={{marginRight: '8px'}} />
+              Account Actions
+            </h3>
+            
+            <button 
+              onClick={handleSignOut}
+              className="action-btn"
+              style={{
+                width: '100%',
+                justifyContent: 'center',
+                color: '#dc2626',
+                border: '1px solid #dc2626',
+                marginBottom: '12px'
+              }}
+            >
+              Sign Out
+            </button>
+          </div>
+        </aside>
       </div>
     </div>
   );
