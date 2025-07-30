@@ -11,7 +11,7 @@ import ResetPassword from './components/ResetPassword.tsx';
 
 const WelcomePage = () => (
   <div className="p-10 flex flex-col items-center justify-center min-h-screen bg-gray-50 text-center">
-    <h1 className="text-2xl font-bold mb-4">Welcome to MuseConnect!</h1>
+    <h1 className="text-2xl font-bold mb-4">Welcome to theBandFam!</h1>
     <p className="mb-4">Please check your email to confirm your account.</p>
     <p>
       <a href="/signin" className="text-indigo-600 hover:underline">Sign in once confirmed</a>

@@ -24,7 +24,7 @@ const HomePage = ({ user }: HomePageProps) => {
         <div className="nav-left">
           <div className="logo">
             <Music className="h-6 w-6" style={{color: 'var(--accent-color)'}} />
-            <span>MusicConnect</span>
+            <span>theBandFam</span>
           </div>
         </div>
         
@@ -79,7 +79,7 @@ const HomePage = ({ user }: HomePageProps) => {
               <div className="mock-nav">
                 <div className="mock-logo">
                   <Music size={16} style={{color: 'var(--accent-color)'}} />
-                  <span>MusicConnect</span>
+                  <span>theBandFam</span>
                 </div>
                 <div className="mock-search"></div>
                 <div className="mock-icons">
@@ -117,7 +117,7 @@ const HomePage = ({ user }: HomePageProps) => {
       {/* Features Section */}
       <section className="features-section">
         <div className="section-content">
-          <h2>Why Musicians Choose MusicConnect</h2>
+          <h2>Why Musicians Choose theBandFam</h2>
           
           <div className="features-grid">
             <div className="feature-card">
@@ -179,7 +179,7 @@ const HomePage = ({ user }: HomePageProps) => {
           <div className="testimonials-grid">
             <div className="testimonial-card">
               <div className="testimonial-content">
-                <p>"MusicConnect helped me find the perfect vocalist for my EP. The platform made collaboration easy and efficient."</p>
+                <p>"theBandFam helped me find the perfect vocalist for my EP. The platform made collaboration easy and efficient."</p>
               </div>
               <div className="testimonial-author">
                 <div className="author-avatar">AJ</div>
@@ -199,7 +199,7 @@ const HomePage = ({ user }: HomePageProps) => {
             
             <div className="testimonial-card">
               <div className="testimonial-content">
-                <p>"I moved to a new city and found my bandmates through MusicConnect within weeks. Now we're touring together!"</p>
+                <p>"I moved to a new city and found my bandmates through theBandFam within weeks. Now we're touring together!"</p>
               </div>
               <div className="testimonial-author">
                 <div className="author-avatar">SM</div>
@@ -224,7 +224,7 @@ const HomePage = ({ user }: HomePageProps) => {
       <section className="cta-section">
         <div className="section-content">
           <h2>Ready to Connect?</h2>
-          <p>Join thousands of musicians already collaborating on MusicConnect</p>
+          <p>Join thousands of musicians already collaborating on theBandFam</p>
           
           {!user ? (
             <Link to="/signup">
@@ -245,7 +245,7 @@ const HomePage = ({ user }: HomePageProps) => {
             <div className="footer-brand">
               <div className="logo">
                 <Music className="h-6 w-6" style={{color: 'var(--accent-color)'}} />
-                <span>MusicConnect</span>
+                <span>theBandFam</span>
               </div>
               <p>Connecting musicians worldwide</p>
             </div>
@@ -275,7 +275,7 @@ const HomePage = ({ user }: HomePageProps) => {
           </div>
           
           <div className="footer-bottom">
-            <p>© 2025 MusicConnect. All rights reserved.</p>
+            <p>© 2025 theBandFam. All rights reserved.</p>
           </div>
         </div>
       </footer>

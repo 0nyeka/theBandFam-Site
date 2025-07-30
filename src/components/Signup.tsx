@@ -70,7 +70,7 @@ const SignUp = () => {
             <Music className="h-8 w-8 text-indigo-600" />
           </div>
           <h2 className="text-3xl font-bold text-gray-900">Create your account</h2>
-          <p className="mt-2 text-gray-600">Join MuseConnect to find collaborators and grow your music network</p>
+          <p className="mt-2 text-gray-600">Join theBandFam to find collaborators and grow your music network</p>
         </div>
 
         {error && (

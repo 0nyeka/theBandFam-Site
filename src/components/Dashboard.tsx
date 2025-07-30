@@ -48,7 +48,7 @@ const Dashboard = () => {
             style={{ cursor: 'pointer' }}
           >
             <Music className="h-6 w-6" style={{color: 'var(--accent-color)'}} />
-            <span>MusicConnect</span>
+            <span>theBandFam</span>
           </div>
           <div className="search-bar">
             <input 

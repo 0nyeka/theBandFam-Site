@@ -42,7 +42,7 @@ const SignIn = () => {
           <div className="p-3 rounded-full bg-indigo-100 mb-4">
             <Music className="h-8 w-8 text-indigo-600" />
           </div>
-          <h2 className="text-3xl font-bold text-gray-900">Sign In to MuseConnect</h2>
+          <h2 className="text-3xl font-bold text-gray-900">Sign In to theBandFam</h2>
           <p className="mt-2 text-gray-600">Welcome back! Enter your details to continue</p>
         </div>
 
