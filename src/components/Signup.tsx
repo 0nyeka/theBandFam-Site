@@ -63,118 +63,291 @@ const SignUp = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
-        <div className="flex flex-col items-center text-center">
-          <div className="p-3 rounded-full bg-indigo-100 mb-4">
-            <Music className="h-8 w-8 text-indigo-600" />
-          </div>
-          <h2 className="text-3xl font-bold text-gray-900">Create your account</h2>
-          <p className="mt-2 text-gray-600">Join theBandFam to find collaborators and grow your music network</p>
-        </div>
-
-        {error && (
-          <div className="p-3 bg-red-50 text-red-700 rounded-md text-sm">
-            {error}
-          </div>
-        )}
-
-        <form className="space-y-6" onSubmit={handleSignUp}>
-          <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium text-gray-700">Email</label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              required
-              className="w-full"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="displayName" className="text-sm font-medium text-gray-700">Display Name</label>
-            <Input
-              id="displayName"
-              type="text"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="How others will see you"
-              required
-              className="w-full"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="musicianType" className="text-sm font-medium text-gray-700">I am a...</label>
-            <Select value={musicianType} onValueChange={setMusicianType}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select your role" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="vocalist">Vocalist</SelectItem>
-                <SelectItem value="guitarist">Guitarist</SelectItem>
-                <SelectItem value="bassist">Bassist</SelectItem>
-                <SelectItem value="drummer">Drummer</SelectItem>
-                <SelectItem value="pianist">Pianist/Keyboardist</SelectItem>
-                <SelectItem value="producer">Producer</SelectItem>
-                <SelectItem value="songwriter">Songwriter</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="password" className="text-sm font-medium text-gray-700">Password</label>
-            <div className="relative">
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Create a secure password"
-                required
-                className="w-full pr-10"
-                minLength={8}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
-              >
-                {showPassword ? (
-                  <EyeOff className="h-5 w-5" />
-                ) : (
-                  <Eye className="h-5 w-5" />
-                )}
-              </button>
-            </div>
-            <p className="text-xs text-gray-500">Must be at least 8 characters</p>
-          </div>
-
-          <Button
-            type="submit"
-            disabled={loading}
-            className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700"
+    <div className="homepage-container">
+      {/* Top Navigation */}
+      <nav className="top-nav">
+        <div className="nav-left">
+          <div 
+            className="logo clickable-logo"
+            onClick={() => navigate('/')}
+            style={{ cursor: 'pointer' }}
           >
-            {loading ? (
-              <span>Creating Account...</span>
-            ) : (
-              <>
-                <UserPlus className="h-5 w-5" /> Sign Up
-              </>
-            )}
-          </Button>
-        </form>
-
-        <div className="text-center text-sm">
-          <p className="text-gray-600">
-            Already have an account?{' '}
-            <Link to="/signin" className="font-medium text-indigo-600 hover:text-indigo-500">
-              Sign in
+            <Music className="h-6 w-6" style={{color: 'var(--accent-color)'}} />
+            <span>theBandFam</span>
+          </div>
+        </div>
+        
+        <div className="nav-right">
+          <div className="auth-buttons">
+            <Link to="/signin">
+              <button className="action-btn">Sign In</button>
             </Link>
-          </p>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <div style={{ 
+        minHeight: 'calc(100vh - 80px)', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        padding: '20px'
+      }}>
+        <div style={{
+          width: '100%',
+          maxWidth: '500px',
+          background: 'var(--card-bg)',
+          borderRadius: '12px',
+          padding: '40px',
+          border: '1px solid var(--border-color)',
+          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)'
+        }}>
+          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <div style={{
+              padding: '16px',
+              borderRadius: '50%',
+              background: 'var(--sidebar-bg)',
+              display: 'inline-flex',
+              marginBottom: '16px'
+            }}>
+              <Music className="h-8 w-8" style={{color: 'var(--accent-color)'}} />
+            </div>
+            <h2 style={{
+              fontSize: '28px',
+              fontWeight: 'bold',
+              color: 'var(--text-primary)',
+              margin: '0 0 8px 0'
+            }}>
+              Create your account
+            </h2>
+            <p style={{
+              color: 'var(--text-secondary)',
+              fontSize: '16px',
+              margin: 0
+            }}>
+              Join theBandFam to find collaborators and grow your music network
+            </p>
+          </div>
+
+          {error && (
+            <div style={{
+              padding: '12px 16px',
+              backgroundColor: '#fef2f2',
+              color: '#dc2626',
+              borderRadius: '8px',
+              marginBottom: '24px',
+              fontSize: '14px',
+              border: '1px solid #fecaca'
+            }}>
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSignUp} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: 'var(--text-primary)',
+                marginBottom: '8px'
+              }}>
+                Email
+              </label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                required
+                style={{
+                  width: 'calc(100% - 30px)',
+                  padding: '12px 16px',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  outline: 'none',
+                  backgroundColor: 'var(--card-bg)',
+                  color: 'var(--text-primary)'
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: 'var(--text-primary)',
+                marginBottom: '8px'
+              }}>
+                Display Name
+              </label>
+              <Input
+                id="displayName"
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="How others will see you"
+                required
+                style={{
+                  width: 'calc(100% - 30px)',
+                  padding: '12px 16px',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  outline: 'none',
+                  backgroundColor: 'var(--card-bg)',
+                  color: 'var(--text-primary)'
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: 'var(--text-primary)',
+                marginBottom: '8px'
+              }}>
+                I am a...
+              </label>
+              <Select value={musicianType} onValueChange={setMusicianType}>
+                <SelectTrigger style={{
+                  width: 'calc(100% + 5px)',
+                  padding: '7px 16px',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  backgroundColor: 'var(--card-bg)',
+                  color: 'var(--text-primary)'
+                }}>
+                  <SelectValue placeholder="Select your role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="vocalist">Vocalist</SelectItem>
+                  <SelectItem value="guitarist">Guitarist</SelectItem>
+                  <SelectItem value="bassist">Bassist</SelectItem>
+                  <SelectItem value="drummer">Drummer</SelectItem>
+                  <SelectItem value="pianist">Pianist/Keyboardist</SelectItem>
+                  <SelectItem value="producer">Producer</SelectItem>
+                  <SelectItem value="songwriter">Songwriter</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: 'var(--text-primary)',
+                marginBottom: '8px'
+              }}>
+                Password
+              </label>
+              <div style={{ position: 'relative' }}>
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Create a secure password"
+                  required
+                  minLength={8}
+                  style={{
+                    width: 'calc(100% - 60px)',
+                    padding: '12px 45px 12px 16px',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '8px',
+                    fontSize: '16px',
+                    outline: 'none',
+                    backgroundColor: 'var(--card-bg)',
+                    color: 'var(--text-primary)'
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '12px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    color: 'var(--text-secondary)',
+                    padding: '4px'
+                  }}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
+              <p style={{
+                fontSize: '12px',
+                color: 'var(--text-secondary)',
+                margin: '4px 0 0 0'
+              }}>
+                Must be at least 8 characters
+              </p>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="post-btn"
+              style={{
+                width: '100%',
+                padding: '14px 24px',
+                fontSize: '16px',
+                fontWeight: '600',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                marginTop: '8px',
+                opacity: loading ? 0.7 : 1,
+                cursor: loading ? 'not-allowed' : 'pointer'
+              }}
+            >
+              {loading ? (
+                <span>Creating Account...</span>
+              ) : (
+                <>
+                  <UserPlus className="h-5 w-5" /> Sign Up
+                </>
+              )}
+            </button>
+          </form>
+
+          <div style={{
+            textAlign: 'center',
+            marginTop: '24px',
+            fontSize: '14px'
+          }}>
+            <p style={{ color: 'var(--text-secondary)', margin: 0 }}>
+              Already have an account?{' '}
+              <Link 
+                to="/signin" 
+                style={{
+                  color: 'var(--accent-color)',
+                  textDecoration: 'none',
+                  fontWeight: '500'
+                }}
+              >
+                Sign in
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

@@ -173,7 +173,11 @@ const AccountSettings = () => {
       <div className="dashboard-container">
         <nav className="top-nav">
           <div className="nav-left">
-            <div className="logo">
+            <div 
+              className="logo clickable-logo"
+              onClick={() => navigate('/')}
+              style={{ cursor: 'pointer' }}
+            >
               <Music className="h-6 w-6" style={{color: 'var(--accent-color)'}} />
               <span>theBandFam</span>
             </div>
@@ -193,9 +197,13 @@ const AccountSettings = () => {
       {/* Top Navigation */}
       <nav className="top-nav">
         <div className="nav-left">
-          <div className="logo">
+          <div 
+            className="logo clickable-logo"
+            onClick={() => navigate('/')}
+            style={{ cursor: 'pointer' }}
+          >
             <Music className="h-6 w-6" style={{color: 'var(--accent-color)'}} />
-            <span>MusicConnect</span>
+            <span>theBandFam</span>
           </div>
         </div>
         
@@ -404,48 +412,46 @@ const AccountSettings = () => {
                   </div>
                 </div>
 
-                <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px'}}>
-                  <div>
-                    <label style={{display: 'block', marginBottom: '8px', fontWeight: '500'}}>First Name</label>
-                    <input
-                      type="text"
-                      value={profile.display_name?.split(' ')[0] || ''}
-                      onChange={(e) => {
-                        const lastName = profile.display_name?.split(' ').slice(1).join(' ') || '';
-                        setProfile({...profile, display_name: `${e.target.value} ${lastName}`.trim()});
-                      }}
-                      placeholder="John"
-                      style={{
-                        width: '100%',
-                        padding: '8px 12px',
-                        border: '1px solid var(--border-color)',
-                        borderRadius: '6px',
-                        outline: 'none',
-                        backgroundColor: 'var(--sidebar-bg)'
-                      }}
-                    />
-                  </div>
-                  
-                  <div>
-                    <label style={{display: 'block', marginBottom: '8px', fontWeight: '500'}}>Last Name</label>
-                    <input
-                      type="text"
-                      value={profile.display_name?.split(' ').slice(1).join(' ') || ''}
-                      onChange={(e) => {
-                        const firstName = profile.display_name?.split(' ')[0] || '';
-                        setProfile({...profile, display_name: `${firstName} ${e.target.value}`.trim()});
-                      }}
-                      placeholder="Doe"
-                      style={{
-                        width: '100%',
-                        padding: '8px 12px',
-                        border: '1px solid var(--border-color)',
-                        borderRadius: '6px',
-                        outline: 'none',
-                        backgroundColor: 'var(--sidebar-bg)'
-                      }}
-                    />
-                  </div>
+                <div style={{marginBottom: '16px'}}>
+                  <label style={{display: 'block', marginBottom: '8px', fontWeight: '500'}}>First Name</label>
+                  <input
+                    type="text"
+                    value={profile.display_name?.split(' ')[0] || ''}
+                    onChange={(e) => {
+                      const lastName = profile.display_name?.split(' ').slice(1).join(' ') || '';
+                      setProfile({...profile, display_name: `${e.target.value} ${lastName}`.trim()});
+                    }}
+                    placeholder="John"
+                    style={{
+                      width: 'calc(100% - 30px)',
+                      padding: '8px 12px',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '6px',
+                      outline: 'none',
+                      backgroundColor: 'var(--sidebar-bg)'
+                    }}
+                  />
+                </div>
+                
+                <div style={{marginBottom: '16px'}}>
+                  <label style={{display: 'block', marginBottom: '8px', fontWeight: '500'}}>Last Name</label>
+                  <input
+                    type="text"
+                    value={profile.display_name?.split(' ').slice(1).join(' ') || ''}
+                    onChange={(e) => {
+                      const firstName = profile.display_name?.split(' ')[0] || '';
+                      setProfile({...profile, display_name: `${firstName} ${e.target.value}`.trim()});
+                    }}
+                    placeholder="Doe"
+                    style={{
+                      width: 'calc(100% - 30px)',
+                      padding: '8px 12px',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '6px',
+                      outline: 'none',
+                      backgroundColor: 'var(--sidebar-bg)'
+                    }}
+                  />
                 </div>
 
                 <div style={{marginBottom: '16px'}}>
@@ -455,7 +461,7 @@ const AccountSettings = () => {
                     value={user.email}
                     disabled
                     style={{
-                      width: '100%',
+                      width: 'calc(100% - 30px)',
                       padding: '8px 12px',
                       border: '1px solid var(--border-color)',
                       borderRadius: '6px',
@@ -472,7 +478,7 @@ const AccountSettings = () => {
                     value={profile.primary_instrument || 'Bass Guitar'}
                     onChange={(e) => setProfile({...profile, primary_instrument: e.target.value})}
                     style={{
-                      width: '100%',
+                      width: 'calc(100% - 4px)',
                       padding: '8px 12px',
                       border: '1px solid var(--border-color)',
                       borderRadius: '6px',
@@ -497,7 +503,7 @@ const AccountSettings = () => {
                     placeholder="Passionate bass player with 10+ years of experience. Love jazz fusion and funk. Always looking for new collaboration opportunities!"
                     rows={4}
                     style={{
-                      width: '100%',
+                      width: 'calc(100% - 30px)',
                       padding: '8px 12px',
                       border: '1px solid var(--border-color)',
                       borderRadius: '6px',
@@ -516,7 +522,7 @@ const AccountSettings = () => {
                     onChange={(e) => setProfile({...profile, location: e.target.value})}
                     placeholder="Los Angeles, CA"
                     style={{
-                      width: '100%',
+                      width: 'calc(100% - 30px)',
                       padding: '8px 12px',
                       border: '1px solid var(--border-color)',
                       borderRadius: '6px',
@@ -549,7 +555,7 @@ const AccountSettings = () => {
                         onChange={(e) => setCurrentPassword(e.target.value)}
                         placeholder="Enter your current password"
                         style={{
-                          width: '100%',
+                          width: 'calc(100% - 60px)',
                           padding: '8px 40px 8px 12px',
                           border: '1px solid var(--border-color)',
                           borderRadius: '6px',
@@ -584,7 +590,7 @@ const AccountSettings = () => {
                       onChange={(e) => setNewPassword(e.target.value)}
                       placeholder="Create a new password"
                       style={{
-                        width: '100%',
+                        width: 'calc(100% - 30px)',
                         padding: '8px 12px',
                         border: '1px solid var(--border-color)',
                         borderRadius: '6px',
@@ -605,7 +611,7 @@ const AccountSettings = () => {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Confirm your new password"
                       style={{
-                        width: '100%',
+                        width: 'calc(100% - 30px)',
                         padding: '8px 12px',
                         border: '1px solid var(--border-color)',
                         borderRadius: '6px',
