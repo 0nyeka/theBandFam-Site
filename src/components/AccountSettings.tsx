@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Save, 
@@ -17,7 +17,9 @@ import {
   Users,
   Calendar,
   MessageSquare,
-  Compass
+  Compass,
+  Upload,
+  X
 } from 'lucide-react';
 import { 
   getCurrentUser, 
@@ -25,7 +27,8 @@ import {
   updateProfile,
   updatePassword,
   updateUserSettings,
-  signOut
+  signOut,
+  supabase
 } from '../utils/supabase.ts';
 import { Button } from './ui/button.tsx';
 import { Input } from './ui/input.tsx';
@@ -40,9 +43,11 @@ import { Separator } from './ui/separator.tsx';
 
 const AccountSettings = () => {
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(true);
   const [saveLoading, setSaveLoading] = useState(false);
+  const [uploadLoading, setUploadLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>({});
   const [settings, setSettings] = useState<any>({
@@ -50,6 +55,10 @@ const AccountSettings = () => {
     privacy_level: 'public',
     theme_preference: 'light'
   });
+  
+  // Photo upload states
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   
   // Password states
   const [currentPassword, setCurrentPassword] = useState('');
@@ -60,6 +69,20 @@ const AccountSettings = () => {
   // Error and success messages
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  // Update the display logic throughout the component
+  const displayName = profile.display_name || user?.email || "User";
+  const primaryInstrument = profile.primary_instrument || "Musician";
+
+  // Create separate state for form inputs (temporary values while editing)
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    primaryInstrument: '',
+    bio: '',
+    location: '',
+    availabilityStatus: ''
+  });
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -77,6 +100,31 @@ const AccountSettings = () => {
         const { profile } = await fetchProfile(user.id);
         if (profile) {
           setProfile(profile);
+          
+          // Initialize form data with profile values
+          setFormData({
+            firstName: profile.display_name?.split(' ')[0] || '',
+            lastName: profile.display_name?.split(' ').slice(1).join(' ') || '',
+            primaryInstrument: profile.primary_instrument || 'Bass Guitar',
+            bio: profile.bio || '',
+            location: profile.location || '',
+            availabilityStatus: profile.availability_status || 'available'
+          });
+          
+          // Set image preview if profile has image
+          if (profile.profile_image_url) {
+            setImagePreview(profile.profile_image_url);
+          }
+        } else {
+          // Set default form values if no profile exists
+          setFormData({
+            firstName: '',
+            lastName: '',
+            primaryInstrument: 'Bass Guitar',
+            bio: '',
+            location: '',
+            availabilityStatus: 'available'
+          });
         }
       } catch (error) {
         console.error('Error loading user data:', error);
@@ -88,27 +136,234 @@ const AccountSettings = () => {
     loadUserData();
   }, [navigate]);
 
+  // Add image resizing function
+  const resizeImage = (file: File, maxWidth: number = 400, maxHeight: number = 400, quality: number = 0.8): Promise<File> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+
+      img.onload = () => {
+        // Calculate new dimensions
+        let { width, height } = img;
+        
+        if (width > height) {
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = (width * maxHeight) / height;
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        // Draw and compress
+        ctx?.drawImage(img, 0, 0, width, height);
+        
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              const resizedFile = new File([blob], file.name, {
+                type: file.type,
+                lastModified: Date.now(),
+              });
+              resolve(resizedFile);
+            }
+          },
+          file.type,
+          quality
+        );
+      };
+
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  const handleImageSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setError('Please select a valid image file');
+        return;
+      }
+      
+      // Validate file size (max 10MB for initial upload, we'll compress it)
+      if (file.size > 10 * 1024 * 1024) {
+        setError('Image size must be less than 10MB');
+        return;
+      }
+      
+      try {
+        setUploadLoading(true);
+        setError(null);
+        
+        // Resize the image to be smaller
+        const resizedFile = await resizeImage(file, 400, 400, 0.8);
+        
+        setSelectedImage(resizedFile);
+        
+        // Create preview
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setImagePreview(e.target?.result as string);
+        };
+        reader.readAsDataURL(resizedFile);
+        
+        setError(null);
+      } catch (error) {
+        setError('Failed to process image');
+      } finally {
+        setUploadLoading(false);
+      }
+    }
+  };
+
+  const handleImageUpload = async () => {
+    if (!selectedImage || !user) {
+      return;
+    }
+
+    setUploadLoading(true);
+    setError(null);
+
+    try {
+      // Check if bucket exists first
+      const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
+      
+      if (bucketsError) {
+        throw new Error('Failed to check storage buckets');
+      }
+
+      const bucketExists = buckets?.some(bucket => bucket.name === 'profile-images');
+      
+      if (!bucketExists) {
+        throw new Error('Storage bucket "profile-images" not found. Please create it in your Supabase dashboard under Storage > New bucket.');
+      }
+
+      const fileExt = selectedImage.name.split('.').pop();
+      const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      // Upload image to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('profile-images')
+        .upload(filePath, selectedImage, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('profile-images')
+        .getPublicUrl(filePath);
+
+      const publicUrl = urlData.publicUrl;
+
+      // Update profile with new image URL
+      const { error: updateError } = await updateProfile(user.id, {
+        ...profile,
+        profile_image_url: publicUrl
+      });
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      // Update local state
+      setProfile({ ...profile, profile_image_url: publicUrl });
+      setSelectedImage(null);
+      setSuccess('Profile photo updated successfully');
+
+    } catch (err: any) {
+      console.error('Upload error:', err);
+      setError(err.message || 'Failed to upload image');
+      // Reset preview on error
+      setImagePreview(profile.profile_image_url || null);
+    } finally {
+      setUploadLoading(false);
+    }
+  };
+
+  const handleRemovePhoto = async () => {
+    if (!user) return;
+
+    setUploadLoading(true);
+    setError(null);
+
+    try {
+      // If there's an existing image, try to delete it from storage
+      if (profile.profile_image_url) {
+        const urlParts = profile.profile_image_url.split('/');
+        const fileName = urlParts[urlParts.length - 1];
+        if (fileName) {
+          await supabase.storage
+            .from('profile-images')
+            .remove([fileName]);
+        }
+      }
+
+      // Update profile to remove image URL
+      const { error: updateError } = await updateProfile(user.id, {
+        ...profile,
+        profile_image_url: null
+      });
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      // Update local state
+      setProfile({ ...profile, profile_image_url: null });
+      setImagePreview(null);
+      setSelectedImage(null);
+      setSuccess('Profile photo removed successfully');
+
+    } catch (err: any) {
+      setError(err.message || 'Failed to remove photo');
+    } finally {
+      setUploadLoading(false);
+    }
+  };
+
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
   };
 
+  // Update the handleProfileUpdate function to include primary_instrument
   const handleProfileUpdate = async () => {
     setError(null);
     setSuccess(null);
     setSaveLoading(true);
     
     try {
-      const { error } = await updateProfile(user.id, {
-        display_name: profile.display_name,
-        bio: profile.bio,
-        location: profile.location,
-        availability_status: profile.availability_status
-      });
+      const updatedProfile = {
+        display_name: `${formData.firstName} ${formData.lastName}`.trim(),
+        bio: formData.bio,
+        location: formData.location,
+        primary_instrument: formData.primaryInstrument,
+        availability_status: formData.availabilityStatus
+      };
+      
+      const { error } = await updateProfile(user.id, updatedProfile);
       
       if (error) throw error;
       
+      // Update the actual profile state with the saved data
+      setProfile({...profile, ...updatedProfile});
+      
       setSuccess('Profile updated successfully');
+      
     } catch (err: any) {
       setError(err.message || 'Failed to update profile');
     } finally {
@@ -225,9 +480,21 @@ const AccountSettings = () => {
           </div>
           <div className="user-avatar">
             <Avatar className="h-8 w-8">
-              <AvatarFallback style={{backgroundColor: 'var(--accent-color)', color: 'white'}}>
-                {user?.email?.charAt(0).toUpperCase() || "U"}
-              </AvatarFallback>
+              {imagePreview ? (
+                <AvatarImage 
+                  src={imagePreview} 
+                  alt="Profile" 
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover'
+                  }}
+                />
+              ) : (
+                <AvatarFallback style={{backgroundColor: 'var(--accent-color)', color: 'white'}}>
+                  {displayName.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              )}
             </Avatar>
           </div>
         </div>
@@ -238,12 +505,24 @@ const AccountSettings = () => {
         <aside className="left-sidebar">
           <div className="user-profile">
             <Avatar className="profile-img">
-              <AvatarFallback style={{backgroundColor: 'var(--accent-color)', color: 'white'}}>
-                {user?.email?.charAt(0).toUpperCase() || "U"}
-              </AvatarFallback>
+              {imagePreview ? (
+                <AvatarImage 
+                  src={imagePreview} 
+                  alt="Profile" 
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover'
+                  }}
+                />
+              ) : (
+                <AvatarFallback style={{backgroundColor: 'var(--accent-color)', color: 'white'}}>
+                  {displayName.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              )}
             </Avatar>
-            <h3>{user?.email || "User"}</h3>
-            <p>Musician</p>
+            <h3>{displayName}</h3>
+            <p>{primaryInstrument}</p>
           </div>
 
           <nav className="sidebar-nav">
@@ -400,15 +679,111 @@ const AccountSettings = () => {
               </div>
 
               <TabsContent value="profile">
+                {/* Profile Photo Section */}
                 <div style={{display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px'}}>
-                  <Avatar style={{width: '80px', height: '80px'}}>
-                    <AvatarFallback style={{backgroundColor: 'var(--accent-color)', color: 'white', fontSize: '24px'}}>
-                      {profile.display_name?.charAt(0) || user.email?.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
+                  <div style={{position: 'relative'}}>
+                    <Avatar style={{width: '120px', height: '120px'}}>
+                      {imagePreview ? (
+                        <AvatarImage 
+                          src={imagePreview} 
+                          alt="Profile" 
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover'
+                          }}
+                        />
+                      ) : (
+                        <AvatarFallback style={{backgroundColor: 'var(--accent-color)', color: 'white', fontSize: '32px'}}>
+                          {displayName.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      )}
+                    </Avatar>
+                    {uploadLoading && (
+                      <div style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0,0,0,0.6)',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'white',
+                        fontSize: '12px',
+                        flexDirection: 'column'
+                      }}>
+                        <div 
+                          className="loading-spinner"
+                          style={{
+                            width: '20px',
+                            height: '20px',
+                            border: '2px solid white',
+                            borderTop: '2px solid transparent',
+                            borderRadius: '50%',
+                            marginBottom: '4px'
+                          }}
+                        ></div>
+                        {selectedImage ? 'Processing...' : 'Uploading...'}
+                      </div>
+                    )}
+                  </div>
+                  
                   <div>
-                    <button className="action-btn">Change Photo</button>
-                    <button className="action-btn" style={{marginLeft: '8px'}}>Remove Photo</button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageSelect}
+                      style={{ display: 'none' }}
+                    />
+                    
+                    <div style={{display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap'}}>
+                      <button 
+                        className="action-btn"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploadLoading}
+                      >
+                        <Upload size={14} style={{marginRight: '4px'}} />
+                        {imagePreview ? 'Change Photo' : 'Upload Photo'}
+                      </button>
+                      
+                      {selectedImage && (
+                        <button 
+                          className="post-btn"
+                          onClick={handleImageUpload}
+                          disabled={uploadLoading}
+                          style={{fontSize: '14px', padding: '6px 12px'}}
+                        >
+                          {uploadLoading ? 'Uploading...' : 'Save Photo'}
+                        </button>
+                      )}
+                      
+                      {imagePreview && !uploadLoading && (
+                        <button 
+                          className="action-btn"
+                          onClick={handleRemovePhoto}
+                          disabled={uploadLoading}
+                          style={{color: '#dc2626'}}
+                        >
+                          <X size={14} style={{marginRight: '4px'}} />
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                    
+                    <div style={{marginTop: '8px', fontSize: '12px', color: 'var(--text-secondary)'}}>
+                      {selectedImage && (
+                        <p style={{margin: 0}}>
+                          Click "Save Photo" to apply changes
+                        </p>
+                      )}
+                      <p style={{margin: '4px 0 0 0'}}>
+                        Images will be automatically resized to 400x400px for optimal performance
+                      </p>
+                    </div>
                   </div>
                 </div>
 
@@ -416,11 +791,8 @@ const AccountSettings = () => {
                   <label style={{display: 'block', marginBottom: '8px', fontWeight: '500'}}>First Name</label>
                   <input
                     type="text"
-                    value={profile.display_name?.split(' ')[0] || ''}
-                    onChange={(e) => {
-                      const lastName = profile.display_name?.split(' ').slice(1).join(' ') || '';
-                      setProfile({...profile, display_name: `${e.target.value} ${lastName}`.trim()});
-                    }}
+                    value={formData.firstName}
+                    onChange={(e) => setFormData({...formData, firstName: e.target.value})}
                     placeholder="John"
                     style={{
                       width: 'calc(100% - 30px)',
@@ -437,11 +809,8 @@ const AccountSettings = () => {
                   <label style={{display: 'block', marginBottom: '8px', fontWeight: '500'}}>Last Name</label>
                   <input
                     type="text"
-                    value={profile.display_name?.split(' ').slice(1).join(' ') || ''}
-                    onChange={(e) => {
-                      const firstName = profile.display_name?.split(' ')[0] || '';
-                      setProfile({...profile, display_name: `${firstName} ${e.target.value}`.trim()});
-                    }}
+                    value={formData.lastName}
+                    onChange={(e) => setFormData({...formData, lastName: e.target.value})}
                     placeholder="Doe"
                     style={{
                       width: 'calc(100% - 30px)',
@@ -455,28 +824,10 @@ const AccountSettings = () => {
                 </div>
 
                 <div style={{marginBottom: '16px'}}>
-                  <label style={{display: 'block', marginBottom: '8px', fontWeight: '500'}}>Email</label>
-                  <input
-                    type="email"
-                    value={user.email}
-                    disabled
-                    style={{
-                      width: 'calc(100% - 30px)',
-                      padding: '8px 12px',
-                      border: '1px solid var(--border-color)',
-                      borderRadius: '6px',
-                      outline: 'none',
-                      backgroundColor: '#f3f4f6',
-                      color: 'var(--text-secondary)'
-                    }}
-                  />
-                </div>
-
-                <div style={{marginBottom: '16px'}}>
                   <label style={{display: 'block', marginBottom: '8px', fontWeight: '500'}}>Primary Instrument</label>
                   <select
-                    value={profile.primary_instrument || 'Bass Guitar'}
-                    onChange={(e) => setProfile({...profile, primary_instrument: e.target.value})}
+                    value={formData.primaryInstrument}
+                    onChange={(e) => setFormData({...formData, primaryInstrument: e.target.value})}
                     style={{
                       width: 'calc(100% - 4px)',
                       padding: '8px 12px',
@@ -492,14 +843,18 @@ const AccountSettings = () => {
                     <option value="Vocals">Vocals</option>
                     <option value="Piano">Piano</option>
                     <option value="Violin">Violin</option>
+                    <option value="Saxophone">Saxophone</option>
+                    <option value="Trumpet">Trumpet</option>
+                    <option value="Keyboard">Keyboard</option>
+                    <option value="Flute">Flute</option>
                   </select>
                 </div>
 
                 <div style={{marginBottom: '16px'}}>
                   <label style={{display: 'block', marginBottom: '8px', fontWeight: '500'}}>Bio</label>
                   <textarea
-                    value={profile.bio || ''}
-                    onChange={(e) => setProfile({...profile, bio: e.target.value})}
+                    value={formData.bio}
+                    onChange={(e) => setFormData({...formData, bio: e.target.value})}
                     placeholder="Passionate bass player with 10+ years of experience. Love jazz fusion and funk. Always looking for new collaboration opportunities!"
                     rows={4}
                     style={{
@@ -514,12 +869,12 @@ const AccountSettings = () => {
                   />
                 </div>
 
-                <div style={{marginBottom: '24px'}}>
+                <div style={{marginBottom: '16px'}}>
                   <label style={{display: 'block', marginBottom: '8px', fontWeight: '500'}}>Location</label>
                   <input
                     type="text"
-                    value={profile.location || ''}
-                    onChange={(e) => setProfile({...profile, location: e.target.value})}
+                    value={formData.location}
+                    onChange={(e) => setFormData({...formData, location: e.target.value})}
                     placeholder="Los Angeles, CA"
                     style={{
                       width: 'calc(100% - 30px)',
@@ -530,6 +885,26 @@ const AccountSettings = () => {
                       backgroundColor: 'var(--sidebar-bg)'
                     }}
                   />
+                </div>
+
+                <div style={{marginBottom: '24px'}}>
+                  <label style={{display: 'block', marginBottom: '8px', fontWeight: '500'}}>Availability Status</label>
+                  <select
+                    value={formData.availabilityStatus}
+                    onChange={(e) => setFormData({...formData, availabilityStatus: e.target.value})}
+                    style={{
+                      width: 'calc(100% - 4px)',
+                      padding: '8px 12px',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '6px',
+                      outline: 'none',
+                      backgroundColor: 'var(--sidebar-bg)'
+                    }}
+                  >
+                    <option value="available">Available for collaboration</option>
+                    <option value="busy">Busy</option>
+                    <option value="unavailable">Not available</option>
+                  </select>
                 </div>
 
                 <button 
@@ -642,9 +1017,6 @@ const AccountSettings = () => {
                     <h4 style={{marginBottom: '12px', fontSize: '16px'}}>Favorite Genres (select up to 5)</h4>
                     
                     <div style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px'}}>
-                      {/*
-                        TODO: Replace with dynamic genre options
-                      */}
                       {['Jazz', 'Rock', 'Blues', 'Classical', 'Electronic', 'Reggae', 'Folk', 'Hip Hop', 'Country'].map((genre) => (
                         <label key={genre} style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
                           <input
@@ -699,6 +1071,20 @@ const AccountSettings = () => {
           </div>
         </aside>
       </div>
+
+      {/* Add the CSS as a regular style tag */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .loading-spinner {
+            animation: spin 1s linear infinite;
+          }
+          
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `
+      }} />
     </div>
   );
 };

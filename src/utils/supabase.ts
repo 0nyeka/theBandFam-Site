@@ -157,6 +157,7 @@ export const createProfile = async (userId: string, profileData: any) => {
         display_name: profileData.display_name,
         bio: profileData.bio || null,
         location: profileData.location || null,
+        primary_instrument: profileData.primary_instrument || null, // Add this line
         availability_status: profileData.availability_status || 'available',
         profile_image_url: profileData.profile_image_url || null
         // created_at and updated_at will be handled by default values
@@ -178,17 +179,14 @@ export const createProfile = async (userId: string, profileData: any) => {
 // Fetch user profile
 export const fetchProfile = async (userId: string) => {
   try {
-    const { data, error } = await supabase
+    const { data: profile, error } = await supabase
       .from('profiles')
       .select('*')
-      .eq('user_id', userId)
+      .eq('id', userId)
       .single();
-      
-    if (error) throw error;
     
-    return { profile: data, error: null };
+    return { profile, error };
   } catch (error) {
-    console.error('Error fetching profile:', error);
     return { profile: null, error };
   }
 };
@@ -198,16 +196,20 @@ export const updateProfile = async (userId: string, profileData: any) => {
   try {
     const { data, error } = await supabase
       .from('profiles')
-      .update(profileData)
-      .eq('user_id', userId)
-      .select();
-      
-    if (error) throw error;
+      .update({
+        display_name: profileData.display_name,
+        bio: profileData.bio,
+        location: profileData.location,
+        primary_instrument: profileData.primary_instrument, // Add this
+        availability_status: profileData.availability_status,
+        profile_image_url: profileData.profile_image_url,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId);
     
-    return { profile: data[0], error: null };
+    return { data, error };
   } catch (error) {
-    console.error('Error updating profile:', error);
-    return { profile: null, error };
+    return { data: null, error };
   }
 };
 

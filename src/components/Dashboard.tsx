@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { LogOut, Users, Video, Search as SearchIcon, Calendar, Clock, MapPin, Heart, MessageSquare, Share2, Music, User, Settings, Bell, Home, Compass, Play } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { supabase, signOut, getCurrentUser } from '../utils/supabase.ts';
+import { supabase, signOut, getCurrentUser, fetchProfile } from '../utils/supabase.ts';
 import { Button } from './ui/button.tsx';
 import { Badge } from './ui/badge.tsx';
 import { Skeleton } from './ui/skeleton.tsx';
@@ -15,18 +15,80 @@ import { Input } from './ui/input.tsx';
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("feed");
   const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // Function to fetch profile data
+  const fetchUserProfile = async (userId: string) => {
+    try {
+      const { profile } = await fetchProfile(userId);
+      if (profile) {
+        setProfile(profile);
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
+
   useEffect(() => {
-    const fetchUser = async () => {
-      const { user } = await getCurrentUser();
-      setUser(user || null);
-      setLoading(false);
+    const fetchUserData = async () => {
+      try {
+        const { user } = await getCurrentUser();
+        
+        if (!user) {
+          navigate('/signin');
+          return;
+        }
+        
+        setUser(user);
+        
+        // Fetch profile data
+        await fetchUserProfile(user.id);
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    fetchUser();
-  }, []);
+    fetchUserData();
+  }, [navigate]);
+
+  // Add effect to listen for profile changes
+  useEffect(() => {
+    if (!user) return;
+
+    // Listen for real-time updates to the profiles table
+    const profileSubscription = supabase
+      .channel('profile-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'profiles',
+          filter: `user_id=eq.${user.id}`
+        },
+        (payload) => {
+          console.log('Profile updated:', payload.new);
+          setProfile(payload.new);
+        }
+      )
+      .subscribe();
+
+    // Also add a focus listener to refresh when returning to the page
+    const handleFocus = () => {
+      fetchUserProfile(user.id);
+    };
+
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      profileSubscription.unsubscribe();
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [user]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -36,6 +98,9 @@ const Dashboard = () => {
   if (loading) {
     return <DashboardSkeleton />;
   }
+
+  const displayName = profile.display_name || user?.email || "User";
+  const primaryInstrument = profile.primary_instrument || "Musician";
 
   return (
     <div className="dashboard-container">
@@ -74,9 +139,21 @@ const Dashboard = () => {
           </div>
           <div className="user-avatar">
             <Avatar className="h-8 w-8">
-              <AvatarFallback style={{backgroundColor: 'var(--accent-color)', color: 'white'}}>
-                {user?.email?.charAt(0).toUpperCase() || "U"}
-              </AvatarFallback>
+              {profile.profile_image_url ? (
+                <AvatarImage 
+                  src={profile.profile_image_url} 
+                  alt="Profile" 
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover'
+                  }}
+                />
+              ) : (
+                <AvatarFallback style={{backgroundColor: 'var(--accent-color)', color: 'white'}}>
+                  {displayName.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              )}
             </Avatar>
           </div>
         </div>
@@ -87,19 +164,34 @@ const Dashboard = () => {
         <aside className="left-sidebar">
           <div className="user-profile">
             <Avatar className="profile-img">
-              <AvatarFallback style={{backgroundColor: 'var(--accent-color)', color: 'white'}}>
-                {user?.email?.charAt(0).toUpperCase() || "U"}
-              </AvatarFallback>
+              {profile.profile_image_url ? (
+                <AvatarImage 
+                  src={profile.profile_image_url} 
+                  alt="Profile" 
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover'
+                  }}
+                />
+              ) : (
+                <AvatarFallback style={{backgroundColor: 'var(--accent-color)', color: 'white'}}>
+                  {displayName.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              )}
             </Avatar>
-            <h3>{user?.email || "User"}</h3>
-            <p>Bass Player</p>
+            <h3>{displayName}</h3>
+            <p>{primaryInstrument}</p>
           </div>
 
           <nav className="sidebar-nav">
             <a 
               href="#" 
               className={`nav-item ${activeTab === "feed" ? "active" : ""}`}
-              onClick={() => setActiveTab("feed")}
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveTab("feed");
+              }}
             >
               <span><Home size={16} /> Home</span>
             </a>
@@ -107,7 +199,10 @@ const Dashboard = () => {
             <a 
               href="#" 
               className={`nav-item ${activeTab === "discover" ? "active" : ""}`}
-              onClick={() => setActiveTab("discover")}
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveTab("discover");
+              }}
             >
               <span><Users size={16} /> My Network</span>
               <span className="count">12</span>
@@ -116,7 +211,10 @@ const Dashboard = () => {
             <a 
               href="#" 
               className={`nav-item ${activeTab === "events" ? "active" : ""}`}
-              onClick={() => setActiveTab("events")}
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveTab("events");
+              }}
             >
               <span><Calendar size={16} /> Events</span>
               <span className="count">3</span>
@@ -125,7 +223,10 @@ const Dashboard = () => {
             <a 
               href="#" 
               className={`nav-item ${activeTab === "projects" ? "active" : ""}`}
-              onClick={() => setActiveTab("projects")}
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveTab("projects");
+              }}
             >
               <span><Music size={16} /> My Music</span>
             </a>
@@ -133,7 +234,10 @@ const Dashboard = () => {
             <a 
               href="#" 
               className={`nav-item ${activeTab === "messages" ? "active" : ""}`}
-              onClick={() => setActiveTab("messages")}
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveTab("messages");
+              }}
             >
               <span><Compass size={16} /> Discover</span>
             </a>
@@ -159,9 +263,21 @@ const Dashboard = () => {
               <div className="post-composer">
                 <div className="composer-header">
                   <Avatar className="composer-avatar">
-                    <AvatarFallback style={{backgroundColor: 'var(--accent-color)', color: 'white'}}>
-                      {user?.email?.charAt(0).toUpperCase() || "U"}
-                    </AvatarFallback>
+                    {profile.profile_image_url ? (
+                      <AvatarImage 
+                        src={profile.profile_image_url} 
+                        alt="Profile" 
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover'
+                        }}
+                      />
+                    ) : (
+                      <AvatarFallback style={{backgroundColor: 'var(--accent-color)', color: 'white'}}>
+                        {displayName.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    )}
                   </Avatar>
                   <input 
                     type="text" 
