@@ -8,6 +8,10 @@ import Dashboard from './components/Dashboard.tsx';
 import AccountSettings from './components/AccountSettings.tsx';
 import ForgotPassword from './components/ForgotPassword.tsx';
 import ResetPassword from './components/ResetPassword.tsx';
+import About from './components/About.tsx';
+import Features from './components/Features.tsx';
+import HelpCenter from './components/HelpCenter.tsx';
+import Contact from './components/Contact.tsx';
 
 const WelcomePage = () => (
   <div className="p-10 flex flex-col items-center justify-center min-h-screen bg-gray-50 text-center">
@@ -114,6 +118,10 @@ function App() {
             </ProtectedRoute>
           } 
         />
+        <Route path="/about" element={<About />} />
+        <Route path="/features" element={<Features />} />
+        <Route path="/help" element={<HelpCenter />} />
+        <Route path="/contact" element={<Contact />} />
       </Routes>
     </Router>
   );

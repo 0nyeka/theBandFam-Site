@@ -4,7 +4,6 @@ import { Music, Eye, EyeOff, UserPlus } from 'lucide-react';
 import { signUp, createProfile } from '../utils/supabase.ts';
 import { Button } from './ui/button.tsx';
 import { Input } from './ui/input.tsx';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select.tsx';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
@@ -40,11 +39,19 @@ const SignUp = () => {
       if (error) {
         setError(error.message);
       } else if (data.user) {
-        // Create profile in profiles table
+        // Create profile in profiles table with primary_instrument
         const profileData = {
           display_name: displayName,
           bio: "",
           location: "",
+          primary_instrument: musicianType === 'bassist' ? 'Bass Guitar' :
+                             musicianType === 'guitarist' ? 'Guitar' :
+                             musicianType === 'drummer' ? 'Drums' :
+                             musicianType === 'vocalist' ? 'Vocals' :
+                             musicianType === 'pianist' ? 'Piano' :
+                             musicianType === 'producer' ? 'Producer' :
+                             musicianType === 'songwriter' ? 'Songwriter' :
+                             'Other',
           availability_status: 'available',
           profile_image_url: ""
         };
@@ -215,29 +222,38 @@ const SignUp = () => {
               }}>
                 I am a...
               </label>
-              <Select value={musicianType} onValueChange={setMusicianType}>
-                <SelectTrigger style={{
-                  width: 'calc(100% + 5px)',
-                  padding: '7px 16px',
+              <select
+                value={musicianType}
+                onChange={(e) => setMusicianType(e.target.value)}
+                required
+                style={{
+                  width: 'calc(100% - 4px)',
+                  padding: '12px 16px',
                   border: '1px solid var(--border-color)',
                   borderRadius: '8px',
                   fontSize: '16px',
+                  outline: 'none',
                   backgroundColor: 'var(--card-bg)',
-                  color: 'var(--text-primary)'
-                }}>
-                  <SelectValue placeholder="Select your role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="vocalist">Vocalist</SelectItem>
-                  <SelectItem value="guitarist">Guitarist</SelectItem>
-                  <SelectItem value="bassist">Bassist</SelectItem>
-                  <SelectItem value="drummer">Drummer</SelectItem>
-                  <SelectItem value="pianist">Pianist/Keyboardist</SelectItem>
-                  <SelectItem value="producer">Producer</SelectItem>
-                  <SelectItem value="songwriter">Songwriter</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
+                  color: 'var(--text-primary)',
+                  cursor: 'pointer',
+                  appearance: 'none',
+                  backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 12px center',
+                  backgroundSize: '16px',
+                  paddingRight: '40px'
+                }}
+              >
+                <option value="" disabled>Select your role</option>
+                <option value="vocalist">Vocalist</option>
+                <option value="guitarist">Guitarist</option>
+                <option value="bassist">Bassist</option>
+                <option value="drummer">Drummer</option>
+                <option value="pianist">Pianist/Keyboardist</option>
+                <option value="producer">Producer</option>
+                <option value="songwriter">Songwriter</option>
+                <option value="other">Other</option>
+              </select>
             </div>
 
             <div>

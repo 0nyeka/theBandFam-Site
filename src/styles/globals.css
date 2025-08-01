@@ -1,5 +1,5 @@
 :root {
-  --primary-bg: #11e9e9;
+  --primary-bg:  #007bff;
   --secondary-bg: #2d2d2d;
   --card-bg: #ffffff;
   --sidebar-bg: #f8f9fa;
@@ -1054,4 +1054,23 @@ body {
 
 .clickable-logo:active {
   transform: scale(0.98);
+}
+
+/* Add to your global CSS file */
+@media (max-width: 768px) {
+  .nav-links {
+    display: none !important;
+  }
+  
+  .nav-left {
+    flex: 1;
+  }
+  
+  .top-nav {
+    padding: 0 16px;
+  }
+}
+
+.nav-links a:hover {
+  color: var(--accent-color) !important;
 }

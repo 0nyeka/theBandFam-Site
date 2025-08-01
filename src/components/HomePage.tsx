@@ -26,6 +26,43 @@ const HomePage = ({ user }: HomePageProps) => {
             <Music className="h-6 w-6" style={{color: 'var(--accent-color)'}} />
             <span>theBandFam</span>
           </div>
+          
+          {/* Add navigation links */}
+          <div className="nav-links" style={{
+            display: 'flex',
+            gap: '24px',
+            marginLeft: '32px',
+            alignItems: 'center'
+          }}>
+            <Link 
+              to="/" 
+              style={{
+                color: 'var(--text-primary)',
+                textDecoration: 'none',
+                fontSize: '14px',
+                fontWeight: '500',
+                transition: 'color 0.2s'
+              }}
+              onMouseEnter={(e) => ((e.target as HTMLAnchorElement).style.color = 'var(--accent-color)')}
+              onMouseLeave={(e) => ((e.target as HTMLAnchorElement).style.color = 'var(--text-primary)')}
+            >
+              Home
+            </Link>
+            <Link 
+              to="/about" 
+              style={{
+                color: 'var(--text-primary)',
+                textDecoration: 'none',
+                fontSize: '14px',
+                fontWeight: '500',
+                transition: 'color 0.2s'
+              }}
+              onMouseEnter={(e) => ((e.target as HTMLAnchorElement).style.color = 'var(--accent-color)')}
+              onMouseLeave={(e) => ((e.target as HTMLAnchorElement).style.color = 'var(--text-primary)')}
+            >
+              About
+            </Link>
+          </div>
         </div>
         
         <div className="nav-right">
