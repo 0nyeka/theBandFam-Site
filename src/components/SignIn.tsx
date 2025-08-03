@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Music, Eye, EyeOff, LogIn } from 'lucide-react';
-import { signIn } from '../utils/supabase.ts';
-import { Button } from './ui/button.tsx';
-import { Input } from './ui/input.tsx';
+import { signIn } from '../utils/supabase';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');

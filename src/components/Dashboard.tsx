@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 import { LogOut, Users, Video, Search as SearchIcon, Calendar, Clock, MapPin, Heart, MessageSquare, Share2, Music, User, Settings, Bell, Home, Compass, Play } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { supabase, signOut, getCurrentUser, fetchProfile } from '../utils/supabase.ts';
-import { Button } from './ui/button.tsx';
-import { Badge } from './ui/badge.tsx';
-import { Skeleton } from './ui/skeleton.tsx';
-import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar.tsx';
-import { EmptyState } from './EmptyState.tsx';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs.tsx';
-import { Card } from './ui/card.tsx';
-import { Separator } from './ui/separator.tsx';
-import { Input } from './ui/input.tsx';
+import { supabase, signOut, getCurrentUser, fetchProfile } from '../utils/supabase';
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
+import { Skeleton } from './ui/skeleton';
+import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
+import { EmptyState } from './EmptyState';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Card } from './ui/card';
+import { Separator } from './ui/separator';
+import { Input } from './ui/input';
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("feed");

@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Eye, EyeOff } from 'lucide-react';
-import { supabase, updatePassword } from '../utils/supabase.ts';
-import { Button } from './ui/button.tsx';
-import { Input } from './ui/input.tsx';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card.tsx';
+import { supabase, updatePassword } from '../utils/supabase';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './ui/card';
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -49,7 +49,7 @@ const ResetPassword = () => {
       const { success, error } = await updatePassword(password);
       
       if (error) {
-        setError(error.message);
+        setError((error as { message?: string }).message || 'An error occurred');
       } else if (success) {
         // Redirect to login page
         navigate('/signin', { state: { message: 'Password reset successful. Please sign in with your new password.' } });

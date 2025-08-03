@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Button } from './ui/button.tsx';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card.tsx';
-import { Input } from './ui/input.tsx';
-import { Textarea } from './ui/textarea.tsx';
-import { Badge } from './ui/badge.tsx';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select.tsx';
+import { Button } from './ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Input } from './ui/input';
+import { Textarea } from './ui/textarea';
+import { Badge } from './ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { 
   ArrowLeft, 
   Users, 

@@ -1,4 +1,6 @@
 1. Landing Page (Homepage)
+Bandfam.net
+Add stock images for music, be creative with it.
 Purpose: Introduce the platform, value proposition, and key features.
 Include: tagline, testimonials, call-to-action buttons (Sign Up / Log In).
 Build early for design cohesion and user onboarding.
@@ -54,6 +56,7 @@ For moderation, reporting, and managing user behavior/content.
 Optional Extras (after MVP):
 Feed / Activity Wall – See recent posts, updates, track uploads.
 Monetization – Add payment integrations for selling beats, lessons, or paid collaborations.
+Make it so new users can still explore the website a bit, when they want to interact prompt them to make an account.
 
 Production Phases
 1. Page Order & MVP Milestone Phases

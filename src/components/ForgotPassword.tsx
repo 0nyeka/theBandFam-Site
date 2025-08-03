@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, ArrowLeft } from 'lucide-react';
-import { requestPasswordReset } from '../utils/supabase.ts';
-import { Button } from './ui/button.tsx';
-import { Input } from './ui/input.tsx';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card.tsx';
+import { requestPasswordReset } from '../utils/supabase';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -22,7 +22,7 @@ const ForgotPassword = () => {
       const { success, error } = await requestPasswordReset(email);
       
       if (error) {
-        setError(error.message);
+        setError((error as { message?: string }).message || 'An error occurred');
       } else if (success) {
         setSuccessMessage(`Password reset instructions have been sent to ${email}`);
         setEmail('');

@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { supabase, getCurrentUser } from './utils/supabase.ts';
-import HomePage from './components/HomePage.tsx';
-import SignIn from './components/SignIn.tsx';
-import SignUp from './components/Signup.tsx';
-import Dashboard from './components/Dashboard.tsx';
-import AccountSettings from './components/AccountSettings.tsx';
-import ForgotPassword from './components/ForgotPassword.tsx';
-import ResetPassword from './components/ResetPassword.tsx';
-import About from './components/About.tsx';
-import Features from './components/Features.tsx';
-import HelpCenter from './components/HelpCenter.tsx';
-import Contact from './components/Contact.tsx';
+import { supabase, getCurrentUser } from './utils/supabase'; // Remove .ts
+import HomePage from './components/HomePage'; // Remove .tsx
+import SignIn from './components/SignIn'; // Remove .tsx
+import SignUp from './components/Signup'; // Remove .tsx
+import Dashboard from './components/Dashboard'; // Remove .tsx
+import AccountSettings from './components/AccountSettings'; // Remove .tsx
+import ForgotPassword from './components/ForgotPassword'; // Remove .tsx
+import ResetPassword from './components/ResetPassword'; // Remove .tsx
+import About from './components/About'; // Remove .tsx
+import Features from './components/Features'; // Remove .tsx
+import HelpCenter from './components/HelpCenter'; // Remove .tsx
+import Contact from './components/Contact'; // Remove .tsx
 
 const WelcomePage = () => (
   <div className="p-10 flex flex-col items-center justify-center min-h-screen bg-gray-50 text-center">

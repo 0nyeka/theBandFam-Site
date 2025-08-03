@@ -1,11 +1,11 @@
 // Leave necessary imports
 import { useState, useEffect, useRef } from 'react';
-import { Card, CardContent } from './ui/card.tsx';
-import { Button } from './ui/button.tsx';
-import { Input } from './ui/input.tsx';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar.tsx';
-import { Badge } from './ui/badge.tsx';
-import { Skeleton } from './ui/skeleton.tsx';
+import { Card, CardContent } from './ui/card';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Badge } from './ui/badge';
+import { Skeleton } from './ui/skeleton';
 import { 
   Send, 
   MessageCircle, 
@@ -13,7 +13,7 @@ import {
   Users, 
   ArrowLeft
 } from 'lucide-react';
-import { supabase } from '../utils/supabase.ts';
+import { supabase } from '../utils/supabase';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
 

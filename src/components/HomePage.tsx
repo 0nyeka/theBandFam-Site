@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button } from './ui/button.tsx';
-import { Card } from './ui/card.tsx';
+import { Button } from './ui/button';
+import { Card } from './ui/card';
 import { Music, Users, MessageSquare, Calendar, Search, Play, Heart, Star } from 'lucide-react';
-import { signOut } from '../utils/supabase.ts';
+import { signOut } from '../utils/supabase';
 
+//Users should still be able to access the homepage without being signed in, so we will not require a user prop here.
 interface HomePageProps {
   user?: any; // User object from Supabase Auth
 }

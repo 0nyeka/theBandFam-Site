@@ -29,17 +29,17 @@ import {
   updateUserSettings,
   signOut,
   supabase
-} from '../utils/supabase.ts';
-import { Button } from './ui/button.tsx';
-import { Input } from './ui/input.tsx';
-import { Textarea } from './ui/textarea.tsx';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card.tsx';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs.tsx';
-import { Switch } from './ui/switch.tsx';
-import { Label } from './ui/label.tsx';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select.tsx';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar.tsx';
-import { Separator } from './ui/separator.tsx';
+} from '../utils/supabase';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Textarea } from './ui/textarea';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Switch } from './ui/switch';
+import { Label } from './ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Separator } from './ui/separator';
 
 const AccountSettings = () => {
   const navigate = useNavigate();

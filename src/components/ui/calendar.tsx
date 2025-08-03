@@ -3,7 +3,7 @@
 import * as React from "react";
 import { DayPicker } from "react-day-picker";
 
-import { cn } from "./utils.ts"; // Your className merge function
+import { cn } from "./utils"; // Your className merge function
 import { buttonVariants } from "./button"; // Your Tailwind button style helper
 import "react-day-picker/dist/style.css"; // Optional default styles
 
