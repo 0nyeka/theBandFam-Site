@@ -39,11 +39,11 @@ const SignUp = () => {
       if (error) {
         setError(error.message);
       } else if (data.user) {
-        // Create profile in profiles table with primary_instrument
-        const profileData = {
+        // For email confirmation flow, user will be null initially
+        // Save user metadata for when they confirm
+        localStorage.setItem('pendingUserData', JSON.stringify({
           display_name: displayName,
-          bio: "",
-          location: "",
+          musician_type: musicianType,
           primary_instrument: musicianType === 'bassist' ? 'Bass Guitar' :
                              musicianType === 'guitarist' ? 'Guitar' :
                              musicianType === 'drummer' ? 'Drums' :
@@ -51,15 +51,13 @@ const SignUp = () => {
                              musicianType === 'pianist' ? 'Piano' :
                              musicianType === 'producer' ? 'Producer' :
                              musicianType === 'songwriter' ? 'Songwriter' :
-                             'Other',
-          availability_status: 'available',
-          profile_image_url: ""
-        };
-        
-        await createProfile(data.user.id, profileData);
-        
-        // Successful sign up
-        navigate('/welcome');
+                             'Other'
+        }));
+
+        // Redirect to check email page
+        navigate('/check-email', { 
+          state: { email: email }
+        });
       }
     } catch (err) {
       setError('An unexpected error occurred');

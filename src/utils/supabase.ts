@@ -284,3 +284,35 @@ export const updatePassword = async (newPassword: string) => {
   }
 };
 
+// Add this function to handle profile creation after email confirmation
+export const createProfileAfterConfirmation = async (userId: string) => {
+  try {
+    const pendingUserData = localStorage.getItem('pendingUserData');
+    if (!pendingUserData) {
+      throw new Error('No pending user data found');
+    }
+
+    const userData = JSON.parse(pendingUserData);
+    
+    const profileData = {
+      display_name: userData.display_name,
+      bio: "",
+      location: "",
+      primary_instrument: userData.primary_instrument,
+      availability_status: 'available',
+      profile_image_url: ""
+    };
+    
+    const result = await createProfile(userId, profileData);
+    
+    // Clear the pending data
+    localStorage.removeItem('pendingUserData');
+    localStorage.removeItem('pendingEmail');
+    
+    return result;
+  } catch (error) {
+    console.error('Error creating profile after confirmation:', error);
+    throw error;
+  }
+};
+

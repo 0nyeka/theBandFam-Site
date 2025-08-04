@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
-import { Music, Users, MessageSquare, Calendar, Search, Play, Heart, Star } from 'lucide-react';
+import { Music, Users, MessageSquare, Calendar, Search, Play, Heart, Star, Sparkles, Guitar, Mic, Volume2, Headphones, Radio } from 'lucide-react';
 import { signOut } from '../utils/supabase';
+import '../styles/components/HomePage.css';
 
 //Users should still be able to access the homepage without being signed in, so we will not require a user prop here.
 interface HomePageProps {
@@ -12,6 +13,11 @@ interface HomePageProps {
 
 const HomePage = ({ user }: HomePageProps) => {
   const navigate = useNavigate();
+  const [isVisible, setIsVisible] = useState(false);
+  
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
   
   const handleSignOut = async () => {
     await signOut();
@@ -91,8 +97,17 @@ const HomePage = ({ user }: HomePageProps) => {
       <section className="hero-section">
         <div className="hero-content">
           <div className="hero-text">
-            <h1>Connect. Collaborate. Create.</h1>
-            <p>Join the ultimate platform for musicians to find collaborators, share music, and build their network</p>
+            <h1>
+              Connect. Collaborate. Create.
+              <Guitar size={36} style={{
+                color: 'var(--accent-color)', 
+                marginLeft: '16px',
+                animation: 'pulse 2s infinite',
+                filter: 'drop-shadow(0 0 10px rgba(255, 107, 53, 0.5))'
+              }} />
+            </h1>
+            <p>Join the ultimate platform for musicians to find collaborators, share music, and build their network. Where every note finds its harmony.</p>
+            
             
             {!user ? (
               <div className="hero-actions">
@@ -152,6 +167,36 @@ const HomePage = ({ user }: HomePageProps) => {
         </div>
       </section>
 
+      {/* Join Today Section */}
+      <section className="join-today-section">
+        <div className="section-content">
+          <div className="join-today-grid">
+            <div className="join-today-card">
+              <h3>JOIN TODAY!</h3>
+              <p>Connecting local musicians. Join the thousands of seeking musicians and bands. Premium Musician Classifieds. Sign up today!</p>
+              <Link to="/signup">
+                <button className="post-btn large">SIGN UP</button>
+              </Link>
+            </div>
+            
+            <div className="join-today-card">
+              <h3>THEBANDFAM IS...</h3>
+              <p>theBandFam.com is the largest musicians wanted and musician classifieds online! With thousands of musicians in your area, you have thousands of opportunities to connect.</p>
+              <button className="action-btn large">+ MORE</button>
+            </div>
+            
+            <div className="join-today-card testimonial-preview">
+              <h3>TESTIMONIALS</h3>
+              <blockquote>
+                <p>"This is a great website. I found a lead singer for our band within three weeks."</p>
+                <cite>- Charlotte, North Carolina</cite>
+              </blockquote>
+              <button className="action-btn large">+ MORE</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="features-section">
         <div className="section-content">
@@ -160,7 +205,7 @@ const HomePage = ({ user }: HomePageProps) => {
           <div className="features-grid">
             <div className="feature-card">
               <div className="feature-icon">
-                <Search size={24} style={{color: 'var(--accent-color)'}} />
+                <Search size={28} style={{color: 'white'}} />
               </div>
               <h3>Find Your Musical Match</h3>
               <p>Discover musicians by instrument, genre, location, and availability to form your ideal collaboration.</p>
@@ -168,7 +213,7 @@ const HomePage = ({ user }: HomePageProps) => {
             
             <div className="feature-card">
               <div className="feature-icon">
-                <MessageSquare size={24} style={{color: 'var(--accent-color)'}} />
+                <MessageSquare size={28} style={{color: 'white'}} />
               </div>
               <h3>Seamless Communication</h3>
               <p>Chat directly with potential collaborators, share ideas, and coordinate projects all in one place.</p>
@@ -176,10 +221,34 @@ const HomePage = ({ user }: HomePageProps) => {
             
             <div className="feature-card">
               <div className="feature-icon">
-                <Users size={24} style={{color: 'var(--accent-color)'}} />
+                <Users size={28} style={{color: 'white'}} />
               </div>
               <h3>Grow Your Network</h3>
               <p>Build a portfolio, showcase your work, and connect with a community of like-minded musicians.</p>
+            </div>
+            
+            <div className="feature-card">
+              <div className="feature-icon">
+                <Mic size={28} style={{color: 'white'}} />
+              </div>
+              <h3>Share Your Sound</h3>
+              <p>Upload demos, showcase your talent, and let your music speak for itself in our audio-first platform.</p>
+            </div>
+            
+            <div className="feature-card">
+              <div className="feature-icon">
+                <Volume2 size={28} style={{color: 'white'}} />
+              </div>
+              <h3>Live Collaboration</h3>
+              <p>Join virtual jam sessions, collaborate in real-time, and create music together from anywhere in the world.</p>
+            </div>
+            
+            <div className="feature-card">
+              <div className="feature-icon">
+                <Radio size={28} style={{color: 'white'}} />
+              </div>
+              <h3>Discover New Sounds</h3>
+              <p>Explore different genres, find inspiration, and connect with artists who share your musical vision.</p>
             </div>
           </div>
         </div>
@@ -188,22 +257,31 @@ const HomePage = ({ user }: HomePageProps) => {
       {/* Stats Section */}
       <section className="stats-section">
         <div className="section-content">
+          <h2>The Numbers Speak</h2>
           <div className="stats-grid">
             <div className="stat-card">
-              <div className="stat-number">10,000+</div>
+              <div className="stat-number">25,000+</div>
               <div className="stat-label">Active Musicians</div>
             </div>
             <div className="stat-card">
-              <div className="stat-number">5,000+</div>
+              <div className="stat-number">15,000+</div>
               <div className="stat-label">Collaborations</div>
             </div>
             <div className="stat-card">
-              <div className="stat-number">50+</div>
+              <div className="stat-number">80+</div>
               <div className="stat-label">Countries</div>
             </div>
             <div className="stat-card">
-              <div className="stat-number">100+</div>
+              <div className="stat-number">200+</div>
               <div className="stat-label">Genres</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-number">50,000+</div>
+              <div className="stat-label">Songs Created</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-number">1,000+</div>
+              <div className="stat-label">Bands Formed</div>
             </div>
           </div>
         </div>

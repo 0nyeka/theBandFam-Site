@@ -12,6 +12,8 @@ import About from './components/About'; // Remove .tsx
 import Features from './components/Features'; // Remove .tsx
 import HelpCenter from './components/HelpCenter'; // Remove .tsx
 import Contact from './components/Contact'; // Remove .tsx
+import CheckEmail from './components/CheckEmail';
+import ConfirmAccount from './components/ConfirmAccount';
 
 const WelcomePage = () => (
   <div className="p-10 flex flex-col items-center justify-center min-h-screen bg-gray-50 text-center">
@@ -122,6 +124,8 @@ function App() {
         <Route path="/features" element={<Features />} />
         <Route path="/help" element={<HelpCenter />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/check-email" element={<CheckEmail />} />
+        <Route path="/confirm-account" element={<ConfirmAccount />} />
       </Routes>
     </Router>
   );

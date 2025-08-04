@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Card } from './ui/card';
 import { Separator } from './ui/separator';
 import { Input } from './ui/input';
+import '../styles/components/Dashboard.css';
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("feed");
