@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --font-montserrat: var(--font-montserrat);
+  --font-inter: var(--font-inter);
+}
+
+@layer utilities {
+  .hero-section::before {
+    position: absolute;
+    inset: 0;
+    mix-blend-mode: overlay;
+    content: '';
+    background-image: 
+      url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><path d="M200,200 Q400,100 600,200 T1000,200" stroke="%23ff6b35" stroke-width="2" fill="none" opacity="0.2"/><circle cx="300" cy="300" r="4" fill="%23ffa726" opacity="0.3"/><circle cx="700" cy="500" r="3" fill="%23f39c12" opacity="0.25"/><circle cx="500" cy="700" r="2" fill="%23e67e22" opacity="0.2"/>'),
+      url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="20,20 25,10 30,20 40,15 45,25 35,30 30,40 25,30 15,35 10,25" fill="%23ff6b35" opacity="0.15"/><polygon points="70,60 75,50 80,60 90,55 95,65 85,70 80,80 75,70 65,75 60,65" fill="%23ffa726" opacity="0.12"/>');
+    background-size: 800px 800px, 200px 200px;
+    animation: musicalFloat 25s infinite linear;
+    pointer-events: none; /* So it doesn't block interactions */
+  }
+}
+
+@keyframes musicalFloat {
+  0% { background-position: 0 0, 0 0; }
+  100% { background-position: 1000px 1000px, 200px 200px; }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+    --accent-color: #ff6b35;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  accent-color: var(--accent-color);
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+}
+
+.font-montserrat {
+  font-family: var(--font-montserrat), sans-serif;
+}
+
+.font-inter {
+  font-family: var(--font-inter), sans-serif;
+}
+
+.font-heading {
+  font-family: var(--font-montserrat), sans-serif;
+}
+
+.font-body {
+  font-family: var(--font-inter), sans-serif;
+}
