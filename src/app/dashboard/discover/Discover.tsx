@@ -1,9 +1,10 @@
 'use client';
 import { useState } from "react";
-import SideNav from "@/app/components/SideNav";
-import TopNav from "@/app/components/TopNav";
-import TabbedContent from "@/app/components/TabbedContent";
+import SideNav from "@/app/components/ui/SideNav";
+import TopNav from "@/app/components/ui/TopNav";
+import TabbedContent from "@/app/components/ui/TabbedContent";
 import { Heart, TrendUp, Users, MusicNotes } from "@phosphor-icons/react";
+import PageHeader from "@/app/components/ui/PageHeader";
 
 export default function Discover() {
     const [activeTab, setActiveTab] = useState('foryou');
@@ -54,7 +55,7 @@ export default function Discover() {
         <div className="bg-[#1a1a2e] min-h-screen">
             <TopNav />  
             <SideNav />
-            
+            <PageHeader pageTitle="Discover" pageDescription="Find new music, musicians, and inspirations" />
             <TabbedContent 
                 tabs={tabs}
                 activeTab={activeTab}

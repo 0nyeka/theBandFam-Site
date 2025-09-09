@@ -1,9 +1,11 @@
 'use client';
 import { useState } from "react";
-import SideNav from "@/app/components/SideNav";
-import TopNav from "@/app/components/TopNav";
-import TabbedContent from "@/app/components/TabbedContent";
-import { Calendar, Ticket, Globe } from "@phosphor-icons/react";
+import SideNav from "@/app/components/ui/SideNav";
+import TopNav from "@/app/components/ui/TopNav";
+import TabbedContent from "@/app/components/ui/TabbedContent";
+import { Calendar, Ticket, Globe, PlusIcon } from "@phosphor-icons/react";
+import PageHeader from "@/app/components/ui/PageHeader";
+import Event from "@/app/components/ui/Event";
 
 export default function Events() {
     const [activeTab, setActiveTab] = useState('upcoming');
@@ -18,24 +20,15 @@ export default function Events() {
         switch (activeTab) {
             case 'upcoming':
                 return (
-                    <div className="p-6">
-                        <h2 className="text-2xl font-body text-white mb-4">Upcoming Events</h2>
-                        <p className="text-[#6e7da3]">Your upcoming events will appear here.</p>
-                    </div>
+                    <Event tab="upcoming" />
                 );
             case 'events':
                 return (
-                    <div className="p-6">
-                        <h2 className="text-2xl font-body text-white mb-4">My Events</h2>
-                        <p className="text-[#6e7da3]">Events you've created will appear here.</p>
-                    </div>
+                    <Event tab="events" />
                 );
             case 'discover':
                 return (
-                    <div className="p-6">
-                        <h2 className="text-2xl font-body text-white mb-4">Discover Events</h2>
-                        <p className="text-[#6e7da3]">Find new events to attend will appear here.</p>
-                    </div>
+                    <Event tab="discover" />
                 );
             default:
                 return null;
@@ -46,7 +39,7 @@ export default function Events() {
         <div className="bg-[#1a1a2e] min-h-screen">
             <TopNav />  
             <SideNav />
-            
+            <PageHeader pageTitle="My Events" pageDescription="Discover and organize music events in your area" icon={<PlusIcon size={18} />} buttonText="Create Event" />
             <TabbedContent 
                 tabs={tabs}
                 activeTab={activeTab}

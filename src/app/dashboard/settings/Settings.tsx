@@ -1,5 +1,5 @@
-import SideNav from "@/app/components/SideNav";
-import TopNav from "@/app/components/TopNav";
+import SideNav from "@/app/components/ui/SideNav";
+import TopNav from "@/app/components/ui/TopNav";
 
 export default function Settings() {
     return (

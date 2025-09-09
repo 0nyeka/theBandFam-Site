@@ -1,9 +1,11 @@
 'use client';
 import { useState } from "react";
-import SideNav from "@/app/components/SideNav";
-import TopNav from "@/app/components/TopNav";
-import TabbedContent from "@/app/components/TabbedContent";
-import { MusicNotes, Playlist, Users } from "@phosphor-icons/react";
+import SideNav from "@/app/components/ui/SideNav";
+import TopNav from "@/app/components/ui/TopNav";
+import TabbedContent from "@/app/components/ui/TabbedContent";
+import { MusicNotes, Playlist, Users, PlusIcon } from "@phosphor-icons/react";
+import PageHeader from "@/app/components/ui/PageHeader";
+import MusicComponent from "@/app/components/ui/MusicComponent";
 
 export default function Music() {
     const [activeTab, setActiveTab] = useState('tracks');
@@ -18,24 +20,15 @@ export default function Music() {
         switch (activeTab) {
             case 'tracks':
                 return (
-                    <div className="p-6">
-                        <h2 className="text-2xl font-body text-white mb-4">My Tracks</h2>
-                        <p className="text-[#6e7da3]">Your uploaded tracks will appear here.</p>
-                    </div>
+                    <MusicComponent tab="tracks" />
                 );
             case 'playlists':
                 return (
-                    <div className="p-6">
-                        <h2 className="text-2xl font-body text-white mb-4">Playlists</h2>
-                        <p className="text-[#6e7da3]">Your created and saved playlists will appear here.</p>
-                    </div>
+                    <MusicComponent tab="playlists" />
                 );
             case 'collaborations':
                 return (
-                    <div className="p-6">
-                        <h2 className="text-2xl font-body text-white mb-4">Collaborations</h2>
-                        <p className="text-[#6e7da3]">Your collaborative projects will appear here.</p>
-                    </div>
+                    <MusicComponent tab="collaborations" />
                 );
             default:
                 return null;
@@ -46,7 +39,7 @@ export default function Music() {
         <div className="bg-[#1a1a2e] min-h-screen">
             <TopNav />  
             <SideNav />
-            
+            <PageHeader pageTitle="My Music" pageDescription="Manage your tracks, playlists, and collaborations" icon={<PlusIcon size={18} />} buttonText="New Music" />
             <TabbedContent 
                 tabs={tabs}
                 activeTab={activeTab}

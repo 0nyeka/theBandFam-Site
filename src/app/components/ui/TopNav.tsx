@@ -1,15 +1,18 @@
 'use client';
 import Image from "next/image";
-import logo from "../../assets/logo/theBandFam-logo.png";
+import logo from "../../../assets/logo/theBandFam-logo.png";
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 import TopNavIcon from "./TopNavIcon";
 import ProfileImage from "./ProfileImage";
-import { SpeakerHigh, SpeakerX } from "@phosphor-icons/react";
+import { SpeakerHighIcon, SpeakerXIcon, SunIcon, MoonIcon } from "@phosphor-icons/react";
 
 export default function TopNav() {
     const router = useRouter();
     const [isMuted, setIsMuted] = useState(true);
+    const [isDarkMode, setIsDarkMode] = useState(false);
+
+    const controlButtonStyle = "flex items-center gap-2 bg-[#2c3e57] text-white border border-[#6e7da3] rounded-full p-1 cursor-pointer hover:bg-[#3c4e67] transition-all duration-300";
 
     const navLinks = [
         { href: "/dashboard/home", label: "Home", icon: "home" },
@@ -35,12 +38,15 @@ export default function TopNav() {
                     <TopNavIcon key={link.href} icon={link.icon} label={link.label} href={link.href}/>
                 ))}
                 <ProfileImage firstLetter="O" />
-                <div className="flex items-center gap-4 border-l border-[#6e7da3] pl-4 mr-8" onClick={() => setIsMuted(!isMuted)}>
-                    <div className={"flex items-center gap-2 bg-[#2c3e57] text-white border border-[#6e7da3] rounded-full p-1 cursor-pointer hover:bg-[#3c4e67] transition-all duration-300"}>
-                        {isMuted ? <SpeakerHigh size={20} /> : <SpeakerX size={20} />}
+                <div className="flex items-center gap-4 border-l border-[#6e7da3] pl-4 mr-8">
+                    <div className={controlButtonStyle} onClick={() => setIsMuted(!isMuted)}>
+                        {isMuted ? <SpeakerHighIcon size={20} /> : <SpeakerXIcon size={20} />}
+                    </div>
+                    <div className={controlButtonStyle} onClick={() => setIsDarkMode(!isDarkMode)}>
+                        {isDarkMode ? <MoonIcon size={20} /> : <SunIcon size={20} />}
                     </div>
                 </div>
             </div>
         </nav>
-)
+    );
 }

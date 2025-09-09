@@ -20,6 +20,12 @@
     animation: musicalFloat 25s infinite linear;
     pointer-events: none; /* So it doesn't block interactions */
   }
+  input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+  }
 }
 
 @keyframes musicalFloat {

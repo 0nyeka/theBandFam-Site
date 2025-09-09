@@ -22,7 +22,7 @@ export default function TabNavigation({ tabs, activeTab, onTabChange, className 
                     <button
                         key={tab.id}
                         onClick={() => onTabChange(tab.id)}
-                        className={`relative flex items-center justify-center gap-2 px-6 py-3 rounded-md transition-all duration-300 font-body flex-1 mx-1 group
+                        className={`relative flex items-center justify-center gap-2 px-6 py-1 rounded-md transition-all duration-300 font-body flex-1 mx-1 group
                         ${
                             activeTab === tab.id
                             ? "text-white bg-[linear-gradient(to-top,rgba(255,115,0,0.6)_0%,rgba(40,60,90,1)_20%)]"
@@ -48,5 +48,8 @@ export default function TabNavigation({ tabs, activeTab, onTabChange, className 
         </div>
     );
 }
+
+
+
 
 

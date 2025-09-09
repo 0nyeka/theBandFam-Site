@@ -1,9 +1,11 @@
 'use client';
 import { useState } from "react";
-import SideNav from "@/app/components/SideNav";
-import TopNav from "@/app/components/TopNav";
-import TabbedContent from "@/app/components/TabbedContent";
-import { Users, UserPlus, Lightbulb } from "@phosphor-icons/react";
+import SideNav from "@/app/components/ui/SideNav";
+import TopNav from "@/app/components/ui/TopNav";
+import TabbedContent from "@/app/components/ui/TabbedContent";
+import { Users, UserPlus, Lightbulb, UserPlusIcon } from "@phosphor-icons/react";
+import PageHeader from "@/app/components/ui/PageHeader";
+import NewConnection from "@/app/components/ui/NetworkComponent";
 
 export default function Network() {
     const [activeTab, setActiveTab] = useState('connections');
@@ -18,24 +20,15 @@ export default function Network() {
         switch (activeTab) {
             case 'connections':
                 return (
-                    <div className="p-6">
-                        <h2 className="text-2xl font-body text-white mb-4">My Connections</h2>
-                        <p className="text-[#6e7da3]">Your network connections will appear here.</p>
-                    </div>
+                    <NewConnection tab="connections" />
                 );
             case 'requests':
                 return (
-                    <div className="p-6">
-                        <h2 className="text-2xl font-body text-white mb-4">Connection Requests</h2>
-                        <p className="text-[#6e7da3]">Pending connection requests will appear here.</p>
-                    </div>
+                    <NewConnection tab="requests" />
                 );
             case 'suggestions':
                 return (
-                    <div className="p-6">
-                        <h2 className="text-2xl font-body text-white mb-4">Suggested Connections</h2>
-                        <p className="text-[#6e7da3]">Recommended musicians will appear here.</p>
-                    </div>
+                    <NewConnection tab="suggestions" />
                 );
             default:
                 return null;
@@ -46,7 +39,7 @@ export default function Network() {
         <div className="bg-[#1a1a2e] min-h-screen">
             <TopNav />  
             <SideNav />
-            
+            <PageHeader pageTitle="My Network" pageDescription="Connect with musicians and build your music community." icon={<UserPlusIcon size={18} />} buttonText="Invite Musician" />
             <TabbedContent 
                 tabs={tabs}
                 activeTab={activeTab}

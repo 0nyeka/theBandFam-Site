@@ -16,7 +16,7 @@ export default function SideNav() {
     const pathname = usePathname();
 
     return (
-        <aside className="fixed top-17 left-0 h-full w-45 bg-[linear-gradient(175deg,rgb(40,60,90)_0%,rgba(30,50,80,0.7)_85%)] text-[#6e7da3] text-sm flex flex-col shadow-lg">
+        <aside className="fixed top-17 left-0 h-full w-45 hidden md:block bg-[linear-gradient(175deg,rgb(40,60,90)_0%,rgba(30,50,80,0.7)_85%)] text-[#6e7da3] text-sm flex flex-col shadow-lg">
             {/* Logo / Branding */}
             <div className="p-4 border-b border-gray-700 flex justify-center items-center">
                 <ProfileImage firstLetter="O" />

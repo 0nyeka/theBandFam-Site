@@ -1,11 +1,11 @@
-import TopNav from "../components/TopNav";
-import SideNav from "../components/SideNav";
+import TopNav from "../components/ui/TopNav";
+import MessagesPage from "./MessagesPage";
 
 export default function Messages() {
     return (
-        <div className="bg-[#1a1a2e] min-h-screen"  >
+        <div className="bg-[#1a1a2e] h-screen flex flex-col"  >
             <TopNav />
-            <h1>Messages</h1>
+            <MessagesPage />
         </div>
     )
 }
